@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import neuLogo from "@/public/neu-logo.png";
 
 export function AppSidebar() {
   const router = useRouter();
@@ -30,7 +32,10 @@ export function AppSidebar() {
   return (
     <Sidebar variant="floating">
       <SidebarHeader>
-        <h3>NQueue</h3>
+        <div className="flex items-center gap-2">
+          <Image src={neuLogo} alt="neu-logo" className="h-8 w-8 select-none" />
+          <span className="font-semibold">NEUQueue</span>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

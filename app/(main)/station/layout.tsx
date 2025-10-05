@@ -13,7 +13,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       }
     >
       <main className="w-full h-svh overflow-hidden flex flex-col">
-        <div className="flex-1 min-h-0 ">{children}</div>
+        <div className="flex-1 min-h-0">{children}</div>
       </main>
 
       <StationSidebar />

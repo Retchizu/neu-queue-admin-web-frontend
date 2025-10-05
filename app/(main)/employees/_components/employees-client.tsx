@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useState, useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
@@ -12,6 +12,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import ChangeRoleDialog from "./change-role-dialog";
+import { toast } from "sonner";
 import { DataTable } from "./data-table";
 import { Employee } from "@/types/employee";
 
@@ -21,6 +23,9 @@ interface Props {
 }
 
 export default function EmployeesClient({ employees, search }: Props) {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<Employee | null>(null);
+  const [selectedRole, setSelectedRole] = useState<Employee["role"]>("Cashier");
   const columns: ColumnDef<Employee>[] = [
     {
       accessorKey: "name",
@@ -56,34 +61,55 @@ export default function EmployeesClient({ employees, search }: Props) {
         const roles = ["Admin", "Cashier", "Information"];
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              {roles.map((r) =>
-                r === employee.role ? null : (
-                  <DropdownMenuItem
-                    key={r}
-                    onClick={() => console.log("set-role", employee.id, r)}
-                  >
-                    Set role: {r}
-                  </DropdownMenuItem>
-                )
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                {roles.map((r) =>
+                  r === employee.role ? null : (
+                    <DropdownMenuItem
+                      key={r}
+                      onClick={() => {
+                        setSelected(employee);
+                        setSelectedRole(r as Employee["role"]);
+                        setOpen(true);
+                      }}
+                    >
+                      Set role: {r}
+                    </DropdownMenuItem>
+                  )
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <ChangeRoleDialog
+              open={open}
+              onOpenChange={setOpen}
+              selected={selected}
+              selectedRole={selectedRole}
+              onConfirm={() => {
+                if (!selected) return;
+                // call api for change role here
+                toast.success(
+                  `${selected.email} role changed to ${selectedRole}`
+                );
+              }}
+              onCancel={() => setSelected(null)}
+            />
+          </>
         );
       },
     },
   ];
 
   const q = (search ?? "").trim().toLowerCase();
-  const filtered = React.useMemo(() => {
+  const filtered = useMemo(() => {
     if (!q) return employees;
     return employees.filter((e) =>
       [e.name, e.email, e.role].some((field) => field.toLowerCase().includes(q))

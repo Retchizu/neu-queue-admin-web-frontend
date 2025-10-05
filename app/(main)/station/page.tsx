@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { useVerifyUser } from "@/hooks/useVerifyUser";
 import React from "react";
-import AddStationDialog from "./_components/add-station-dialog";
+import { toast } from "sonner";
 import StationList from "./_components/station-list";
 import CounterList from "./_components/counter-list";
 import type Station from "@/types/station";
@@ -74,6 +74,7 @@ const Stations = () => {
 
   function handleAddStation(newStation: Station) {
     setStations((s) => [...s, newStation]);
+    toast.success(`Station "${newStation.name}" created`);
   }
 
   function handleAddCounter(employeeId: string | null) {
@@ -89,14 +90,58 @@ const Stations = () => {
       cashierId: employeeId || null,
     };
     setCounters((cs) => [...cs, newCounter]);
+    const assigned = employees.find((e) => e.id === employeeId);
+    const stationName = stations[selectedStationIndex]?.name ?? "";
+    toast.success(
+      `Counter ${nextNumber} created for ${stationName}${
+        assigned ? ` (assigned: ${assigned.name})` : ""
+      }`
+    );
   }
 
   function handleAssignEmployee(counterUid: string, employeeId: string | null) {
+    const counter = counters.find((c) => c.uid === counterUid);
+    const prevEmployee = counter
+      ? employees.find((e) => e.id === counter.cashierId)
+      : undefined;
+    const newEmployee = employeeId
+      ? employees.find((e) => e.id === employeeId)
+      : undefined;
+
     setCounters((cs) =>
       cs.map((c) =>
         c.uid === counterUid ? { ...c, cashierId: employeeId } : c
       )
     );
+
+    if (employeeId) {
+      toast.success(
+        `Assigned ${newEmployee ? newEmployee.name : "staff"} to Counter ${
+          counter ? counter.counterNumber : counterUid
+        }`
+      );
+    } else {
+      // removal
+      toast.success(
+        `Removed ${prevEmployee ? prevEmployee.name : "cashier"} from Counter ${
+          counter ? counter.counterNumber : counterUid
+        }`
+      );
+    }
+  }
+
+  function handleCloseCounter(counterUid: string) {
+    const counter = counters.find((c) => c.uid === counterUid);
+    setCounters((cs) => cs.filter((c) => c.uid !== counterUid));
+    if (counter) {
+      const stationIndex = Number(counter.stationID.replace("station-", ""));
+      const stationName = stations[stationIndex]?.name ?? counter.stationID;
+      toast.success(
+        `Closed Counter ${counter.counterNumber} at ${stationName}`
+      );
+    } else {
+      toast.success("Closed counter");
+    }
   }
 
   return (
@@ -107,7 +152,6 @@ const Stations = () => {
           Locate and assign stations along with its designated counter and
           staff.
         </CardDescription>
-        <AddStationDialog />
       </CardHeader>
 
       <CardContent className="flex gap-2 flex-1 min-h-0">
@@ -127,6 +171,7 @@ const Stations = () => {
             selectedStationIndex !== null ? handleAddCounter : undefined
           }
           onAssignEmployee={handleAssignEmployee}
+          onCloseCounter={handleCloseCounter}
         />
       </CardContent>
     </Card>

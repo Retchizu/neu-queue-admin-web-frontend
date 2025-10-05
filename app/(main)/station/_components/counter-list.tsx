@@ -1,12 +1,19 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type Counter from "@/types/counter";
 import type Cashier from "@/types/cashier";
 import AddCounterDialog from "./add-counter-dialog";
 import AssignCashierDialog from "./assign-cashier-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Props {
   counters: Counter[];
@@ -14,6 +21,7 @@ interface Props {
   employees: Cashier[];
   onAddCounter?: (employeeId: string | null) => void;
   onAssignEmployee: (counterUid: string, employeeId: string | null) => void;
+  onCloseCounter?: (counterUid: string) => void;
 }
 
 export default function CounterList({
@@ -22,17 +30,25 @@ export default function CounterList({
   employees,
   onAddCounter,
   onAssignEmployee,
+  onCloseCounter,
 }: Props) {
   return (
-    <div className="w-1/2 p-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-          <CardTitle>Counters</CardTitle>
+    <Card className="flex-1 min-h-0 h-full flex flex-col">
+      <CardHeader>
+        <CardTitle>Counters</CardTitle>
+        <CardDescription className="flex items-center justify-between">
+          Total count: {counters.length}
           {onAddCounter && (
-            <AddCounterDialog employees={employees} onAddCounter={onAddCounter} />
+            <AddCounterDialog
+              employees={employees}
+              onAddCounter={onAddCounter}
+            />
           )}
-        </CardHeader>
-        <CardContent>
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="flex-1 min-h-0 p-0">
+        <ScrollArea className="h-full w-full p-2">
           {selectedStationIndex === null ? (
             <p className="text-muted-foreground text-center">
               Select a station to view its counters
@@ -42,50 +58,43 @@ export default function CounterList({
               No counters for this station
             </p>
           ) : (
-            <div className="space-y-3">
-              {counters.map((counter) => {
-                const assignedEmployee = employees.find(
-                  (emp) => emp.id === counter.cashierId
-                );
-                return (
-                  <AssignCashierDialog
-                    key={counter.uid}
-                    counter={counter}
-                    employees={employees}
-                    onAssignEmployee={onAssignEmployee}
-                  >
-                    <Card className="border cursor-pointer hover:bg-accent/50 transition-colors">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">
-                              Counter {counter.counterNumber}
-                            </h4>
-                            <div className="flex gap-2 mt-2">
-                              <Badge
-                                variant={
-                                  counter.serving ? "default" : "secondary"
-                                }
-                              >
-                                {counter.serving ? "Serving" : "Available"}
-                              </Badge>
-                              {assignedEmployee && (
-                                <Badge variant="outline">
-                                  {assignedEmployee.name}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
+            counters.map((counter) => {
+              const assignedEmployee = employees.find(
+                (emp) => emp.id === counter.cashierId
+              );
+              return (
+                <AssignCashierDialog
+                  key={counter.uid}
+                  counter={counter}
+                  employees={employees}
+                  onAssignEmployee={onAssignEmployee}
+                  onCloseCounter={onCloseCounter}
+                >
+                  <Card className="cursor-pointer hover:bg-muted/50 transition-colors mb-2">
+                    <CardContent className="flex flex-col justify-between h-20">
+                      <div className="font-medium text-lg">
+                        Counter {counter.counterNumber}
+                      </div>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <div className="truncate">
+                          {counter.serving
+                            ? `Serving: ${counter.serving}`
+                            : "Not serving"}
                         </div>
-                      </CardContent>
-                    </Card>
-                  </AssignCashierDialog>
-                );
-              })}
-            </div>
+                        <Badge variant="secondary">
+                          {assignedEmployee
+                            ? assignedEmployee.name
+                            : "No cashier"}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </AssignCashierDialog>
+              );
+            })
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 }

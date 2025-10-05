@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Employee } from "@/types/employee";
@@ -77,7 +76,6 @@ const EmployeesPage = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Button className="ml-auto">Add employee</Button>
         </div>
         <ScrollArea className="flex-1 min-h-0">
           <EmployeesClient employees={employees} search={search} />

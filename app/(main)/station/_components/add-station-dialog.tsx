@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import type CashierType from "@/types/CashierType";
 import type Station from "@/types/station";
+import { saveStation } from "@/app/(main)/station/utils/stationHandlers";
 
 const defaultStation: Station = {
   name: "",
@@ -32,17 +33,13 @@ const AddStationDialog = ({ onSave }: Props) => {
   const [open, setOpen] = React.useState(false);
   const [station, setStation] = React.useState<Station>(defaultStation);
 
-  function handleSave() {
-    if (onSave) onSave(station);
-    else console.log("Saving station", station);
-    setOpen(false);
-    setStation(defaultStation);
-  }
+  const handleSave = () =>
+    saveStation(station, onSave, setOpen, setStation, defaultStation);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full">Add Station</Button>
+        <Button size={"sm"}>Add Station</Button>
       </DialogTrigger>
 
       <DialogContent>

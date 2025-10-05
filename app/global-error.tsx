@@ -1,37 +1,52 @@
 "use client";
 
+import "./globals.css";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import neuLogo from "@/public/neu-logo.png";
+import { Inter } from "next/font/google";
 
-export default function GlobalError({
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata = {
+  title: "500 – Something Went Wrong",
+  description: "An unexpected error occurred. Please try again later.",
+};
+
+const GlobalError = ({
   error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}) => {
   console.error("Global Error:", error);
 
   return (
-    <html>
+    <html lang="en" className={inter.className}>
       <body>
         <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center">
+          {/* Logo */}
           <Image
             src={neuLogo}
             alt="neu-logo"
             className="h-40 w-40 mb-8 select-none"
             priority
           />
+
+          {/* Title */}
           <h1 className="text-5xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-            500 – Something went wrong
+            500 – Something Went Wrong
           </h1>
+
+          {/* Description */}
           <p className="text-gray-600 dark:text-gray-400 max-w-md mb-8">
             We’re sorry, but something unexpected happened. <br />
             Our team has been notified. Please try again later.
           </p>
 
+          {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
               variant="outline"
@@ -48,6 +63,7 @@ export default function GlobalError({
             </Link>
           </div>
 
+          {/* Footer */}
           <p className="text-xs text-gray-400 mt-10">
             © {new Date().getFullYear()} New Era University Queue System
           </p>
@@ -55,4 +71,6 @@ export default function GlobalError({
       </body>
     </html>
   );
-}
+};
+
+export default GlobalError;

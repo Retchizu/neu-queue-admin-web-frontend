@@ -10,27 +10,42 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type Counter from "@/types/counter";
-import type Cashier from "@/types/cashier";
 import AddCounterDialog from "./add-counter-dialog";
 import AssignCashierDialog from "./assign-cashier-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Employee } from "@/types/employee";
+import EditCounterDialog from "./update-counter-dialog";
+import DeleteCounterDialog from "./delete-counter-dialog";
 
-interface Props {
+type Props = {
+  stationId: string;
   counters: Counter[];
-  selectedStationIndex: number | null;
-  employees: Cashier[];
-  onAddCounter?: (employeeId: string | null) => void;
+  selectedStationIndex: string | null;
+  employees: Employee[];
+  availableEmployees: Employee[];
+  onAddCounter?: (
+    stationId: string,
+    newCounter: Partial<Counter>
+  ) => Promise<void>;
+  onUpdateCounter?: (
+    stationId: string,
+    counterId: string,
+    updatedData: Partial<Counter>
+  ) => void;
+  onDeleteCounter?: (stationId: string, counterId: string) => void;
   onAssignEmployee: (counterUid: string, employeeId: string | null) => void;
-  onCloseCounter?: (counterUid: string) => void;
-}
+};
 
 export default function CounterList({
+  stationId,
   counters,
   selectedStationIndex,
   employees,
+  availableEmployees,
   onAddCounter,
+  onUpdateCounter,
+  onDeleteCounter,
   onAssignEmployee,
-  onCloseCounter,
 }: Props) {
   return (
     <Card className="flex-1 min-h-0 h-full flex flex-col">
@@ -40,8 +55,10 @@ export default function CounterList({
           Total count: {counters.length}
           {onAddCounter && (
             <AddCounterDialog
+              stationId={stationId}
               employees={employees}
               onAddCounter={onAddCounter}
+              availableEmployees={availableEmployees}
             />
           )}
         </CardDescription>
@@ -60,21 +77,47 @@ export default function CounterList({
           ) : (
             counters.map((counter) => {
               const assignedEmployee = employees.find(
-                (emp) => emp.id === counter.cashierId
+                (emp) => emp.uid === counter.uid
               );
+
               return (
                 <AssignCashierDialog
-                  key={counter.uid}
+                  key={counter.id}
                   counter={counter}
                   employees={employees}
+                  availableEmployees={availableEmployees}
                   onAssignEmployee={onAssignEmployee}
-                  onCloseCounter={onCloseCounter}
                 >
                   <Card className="cursor-pointer hover:bg-muted/50 transition-colors mb-2">
                     <CardContent className="flex flex-col justify-between h-20">
-                      <div className="font-medium text-lg">
-                        Counter {counter.counterNumber}
+                      <div className="flex items-center justify-between">
+                        <div className="font-medium text-lg">
+                          Counter {counter.counterNumber}
+                        </div>
+
+                        {/* 🧩 Edit + Delete row */}
+                        <div
+                          className="flex items-center gap-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {onUpdateCounter && (
+                            <EditCounterDialog
+                              counter={counter}
+                              stationId={stationId}
+                              onUpdateCounter={onUpdateCounter}
+                            />
+                          )}
+                          {onDeleteCounter && (
+                            <DeleteCounterDialog
+                              stationId={stationId}
+                              counterId={counter.id}
+                              counterNumber={counter.counterNumber}
+                              onDeleteCounter={onDeleteCounter}
+                            />
+                          )}
+                        </div>
                       </div>
+
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <div className="truncate">
                           {counter.serving
@@ -83,7 +126,7 @@ export default function CounterList({
                         </div>
                         <Badge variant="secondary">
                           {assignedEmployee
-                            ? assignedEmployee.name
+                            ? assignedEmployee.displayName
                             : "No cashier"}
                         </Badge>
                       </div>

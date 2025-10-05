@@ -84,7 +84,7 @@ export default function Home() {
           size={"lg"}
         >
           <FaGoogle />
-          Signin with Google
+          Sign in with Google
         </Button>
       )}
 

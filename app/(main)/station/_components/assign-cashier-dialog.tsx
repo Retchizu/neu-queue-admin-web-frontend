@@ -10,9 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import type Counter from "@/types/counter";
-import type Cashier from "@/types/cashier";
 import {
   Popover,
   PopoverTrigger,
@@ -25,11 +23,13 @@ import {
   removeEmployee,
   closeCounter,
 } from "@/app/(main)/station/utils/counterHandlers";
+import { Employee } from "@/types/employee";
 
 interface Props {
   children: React.ReactNode;
   counter: Counter;
-  employees: Cashier[];
+  employees: Employee[];
+  availableEmployees: Employee[];
   onAssignEmployee: (counterUid: string, employeeId: string | null) => void;
   onCloseCounter?: (counterUid: string) => void;
 }
@@ -38,13 +38,13 @@ export default function AssignCashierDialog({
   children,
   counter,
   employees,
+  availableEmployees,
   onAssignEmployee,
-  onCloseCounter,
 }: Props) {
   const [open, setOpen] = React.useState(false);
 
   const assignedEmployee = employees.find(
-    (emp) => emp.id === counter.cashierId
+    (emp) => emp.uid === counter.uid
   );
 
   const handleAssign = (employeeId: string) =>
@@ -52,9 +52,6 @@ export default function AssignCashierDialog({
 
   const handleRemove = () =>
     removeEmployee(counter.uid, onAssignEmployee, setOpen);
-
-  const handleCloseCounter = () =>
-    closeCounter(counter.uid, onCloseCounter, setOpen);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -66,7 +63,7 @@ export default function AssignCashierDialog({
           </DialogTitle>
           <DialogDescription>
             {assignedEmployee
-              ? `Currently assigned: ${assignedEmployee.name}`
+              ? `Currently assigned: ${assignedEmployee.displayName}`
               : `Assign a cashier to Counter ${counter.counterNumber}`}
           </DialogDescription>
         </DialogHeader>
@@ -78,8 +75,7 @@ export default function AssignCashierDialog({
               <p className="text-sm text-muted-foreground">
                 {assignedEmployee ? (
                   <>
-                    <span className="font-medium">{assignedEmployee.name}</span>{" "}
-                    <Badge variant="secondary">{assignedEmployee.type}</Badge>
+                    <span className="font-medium">{assignedEmployee.displayName}</span>{" "}
                   </>
                 ) : (
                   <span className="text-sm">No staff assigned</span>
@@ -95,9 +91,6 @@ export default function AssignCashierDialog({
                 <Button variant="destructive" onClick={handleRemove}>
                   Remove Cashier
                 </Button>
-                <Button variant="destructive" onClick={handleCloseCounter}>
-                  <Trash className="mr-2 h-4 w-4" /> Close Counter
-                </Button>
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -111,36 +104,29 @@ export default function AssignCashierDialog({
                     className="w-72 p-0"
                   >
                     <ScrollArea className="max-h-48 p-2">
-                      <div className="space-y-2">
-                        {employees
-                          .filter((e) => e.type === "payment")
+                     {availableEmployees.length > 0 ?  <div className="space-y-2">
+                        {availableEmployees
                           .map((employee) => (
                             <div
-                              key={employee.id}
+                              key={employee.uid}
                               className="flex items-center justify-between p-2 border rounded"
                             >
                               <div className="flex items-center gap-2">
-                                <span>{employee.name}</span>
-                                <Badge variant="secondary">
-                                  {employee.type}
-                                </Badge>
+                                <span>{employee.displayName}</span>
                               </div>
                               <Button
                                 size="sm"
-                                onClick={() => handleAssign(employee.id)}
+                                onClick={() => handleAssign(employee.uid)}
                               >
                                 Assign
                               </Button>
                             </div>
                           ))}
-                      </div>
+                      </div>: <p className="text-sm">No Available Cashiers</p>}
                     </ScrollArea>
                   </PopoverContent>
                 </Popover>
 
-                <Button variant="destructive" onClick={handleCloseCounter}>
-                  <Trash className="mr-2 h-4 w-4" /> Close Counter
-                </Button>
               </div>
             )}
           </div>

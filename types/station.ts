@@ -1,6 +1,7 @@
 import CashierType from "./CashierType";
 
 type Station = {
+  id: string;
   name: string;
   description: string;
   type: CashierType;
@@ -8,3 +9,5 @@ type Station = {
 };
 
 export default Station;
+
+export type PartialStation = Omit<Station, "id">;

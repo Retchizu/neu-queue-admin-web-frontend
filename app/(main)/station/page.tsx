@@ -7,14 +7,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import StationList from "./_components/station-list";
 import CounterList from "./_components/counter-list";
 import type Station from "@/types/station";
 import type Counter from "@/types/counter";
+import api from "@/lib/api";
+import { Employee } from "@/types/employee";
+import { PartialStation } from "@/types/station";
 
-const initialStations: Station[] = [
+/* const initialStations: Station[] = [
   {
     name: "Main Entrance",
     description: "Main queue for general inquiries",
@@ -54,94 +57,161 @@ const mockEmployees: Cashier[] = [
   { id: "emp-3", name: "Charlie Brown", type: "registrar" },
   { id: "emp-4", name: "Diana Davis", type: "auditing" },
 ];
-
+ */
 const Stations = () => {
-  const [stations, setStations] = React.useState<Station[]>(initialStations);
-  const [counters, setCounters] = React.useState<Counter[]>(initialCounters);
-  const [employees] = React.useState(mockEmployees);
-  const [selectedStationIndex, setSelectedStationIndex] = React.useState<
-    number | null
-  >(null);
+  const [stations, setStations] = useState<Station[]>([]);
+  const [counters, setCounters] = useState<Counter[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [selectedStationId, setSelectedStationId] = useState<string | null>(
+    null
+  );
+  const [availableEmployees, setAvailableEmployees] = useState<Employee[]>([]);
 
-  const selectedStationId =
-    selectedStationIndex !== null ? `station-${selectedStationIndex}` : null;
-
-  const countersForSelected = selectedStationId
-    ? counters.filter((c) => c.stationID === selectedStationId)
-    : [];
-
-  function handleAddStation(newStation: Station) {
-    setStations((s) => [...s, newStation]);
-    toast.success(`Station "${newStation.name}" created`);
-  }
-
-  function handleAddCounter(employeeId: string | null) {
-    if (selectedStationIndex === null) return;
-    const stationId = `station-${selectedStationIndex}`;
-    const stationCounters = counters.filter((c) => c.stationID === stationId);
-    const nextNumber = stationCounters.length + 1;
-    const newCounter: Counter = {
-      counterNumber: nextNumber,
-      stationID: stationId,
-      uid: `ctr-${selectedStationIndex}-${nextNumber - 1}`,
-      serving: null,
-      cashierId: employeeId || null,
+  useEffect(() => {
+    const getStations = async () => {
+      try {
+        const response = await api.get("/station/get");
+        setStations(response.data.cashierLocationList);
+      } catch (error) {
+        console.error(error);
+      }
     };
-    setCounters((cs) => [...cs, newCounter]);
-    const assigned = employees.find((e) => e.id === employeeId);
-    const stationName = stations[selectedStationIndex]?.name ?? "";
-    toast.success(
-      `Counter ${nextNumber} created for ${stationName}${
-        assigned ? ` (assigned: ${assigned.name})` : ""
-      }`
-    );
-  }
+    getStations();
+  }, []);
 
-  function handleAssignEmployee(counterUid: string, employeeId: string | null) {
-    const counter = counters.find((c) => c.uid === counterUid);
-    const prevEmployee = counter
-      ? employees.find((e) => e.id === counter.cashierId)
-      : undefined;
-    const newEmployee = employeeId
-      ? employees.find((e) => e.id === employeeId)
-      : undefined;
+  useEffect(() => {
+    if (selectedStationId === null) return;
 
-    setCounters((cs) =>
-      cs.map((c) =>
-        c.uid === counterUid ? { ...c, cashierId: employeeId } : c
-      )
-    );
+    const getCounter = async () => {
+      try {
+        const response = await api.get(`/counter/get/${selectedStationId}`);
+        setCounters(response.data.counterList);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getCounter();
+  }, [selectedStationId]);
 
-    if (employeeId) {
-      toast.success(
-        `Assigned ${newEmployee ? newEmployee.name : "staff"} to Counter ${
-          counter ? counter.counterNumber : counterUid
-        }`
+  useEffect(() => {
+    const getCounterEmployee = async () => {
+      try {
+        const filteredCounters = counters.filter(
+          (c) => c.uid !== undefined && c.uid !== null
+        );
+        const promises = filteredCounters.map((c) =>
+          api.get(`admin/user-data/${c.uid}`)
+        );
+
+        const responses = await Promise.all(promises);
+
+        const result = responses.map((res) => res.data.userData);
+        setEmployees(result);
+      } catch (error) {
+        console.error("Failed to fetch counter employees:", error);
+      }
+    };
+
+    if (counters.length > 0) {
+      getCounterEmployee();
+    }
+  }, [counters]);
+
+  useEffect(() => {
+    const getAvailableEmployees = async () => {
+      try {
+        const response = await api.get("/admin/available-cashier-employees");
+        setAvailableEmployees(response.data.availableCashiers);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getAvailableEmployees();
+  }, []);
+
+  const addStation = async (newStation: PartialStation) => {
+    try {
+      const response = await api.post("/station/add", newStation);
+      setStations((prev) => [...prev, response.data.station]);
+      toast.success(`${response.data.message}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const updateStation = async (updatedStation: PartialStation) => {
+    try {
+      if (!selectedStationId) return; // safety check
+
+      const response = await api.put(
+        `/station/update/${selectedStationId}`,
+        updatedStation
       );
-    } else {
-      // removal
-      toast.success(
-        `Removed ${prevEmployee ? prevEmployee.name : "cashier"} from Counter ${
-          counter ? counter.counterNumber : counterUid
-        }`
+
+      // update local state
+      setStations((prevStations) =>
+        prevStations.map((s) =>
+          s.id === selectedStationId ? { ...s, ...response.data.station } : s
+        )
       );
+
+      toast.success("Station updated successfully!");
+    } catch (error) {
+      console.error("Failed to update station:", error);
+      toast.error("Failed to update station.");
+    }
+  };
+
+  const deleteStation = async (stationId: string) => {
+    try {
+      const response = await api.delete(`/station/delete/${stationId}`);
+      setStations(stations.filter((station) => station.id !== stationId));
+      toast.success(`${response.data.message}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const addCounter = async (stationId: string, newCounter: Partial<Counter>) => {
+    console.log("test")
+    try {
+      const response = await api.post(`counter/add/${stationId}`, newCounter);
+      setCounters(prev => [...prev, response.data.counter])
+    } catch (error) {
+      console.error(error); 
+    }
+  };
+
+  const updateCounter = async (
+    stationId: string,
+    counterId: string,
+    updatedCounter: Partial<Counter>
+  ) => {
+    try {
+      console.log("test",stationId, counterId)
+      const response = await api.put(
+        `counter/update/${stationId}/${counterId}`,
+        updatedCounter
+      );
+      setCounters((prevCounters) =>
+        prevCounters.map((prev) =>
+          prev.id === counterId ? { ...prev, ...response.data.counter } : prev
+        )
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const deleteCounter = async (stationId: string, counterId: string) => {
+    try {
+      await api.delete(`/counter/delete/${stationId}/${counterId}`)
+      setCounters(prev => prev.filter(c => c.id !== counterId));
+    } catch (error) {
+      console.error(error);
+      
     }
   }
-
-  function handleCloseCounter(counterUid: string) {
-    const counter = counters.find((c) => c.uid === counterUid);
-    setCounters((cs) => cs.filter((c) => c.uid !== counterUid));
-    if (counter) {
-      const stationIndex = Number(counter.stationID.replace("station-", ""));
-      const stationName = stations[stationIndex]?.name ?? counter.stationID;
-      toast.success(
-        `Closed Counter ${counter.counterNumber} at ${stationName}`
-      );
-    } else {
-      toast.success("Closed counter");
-    }
-  }
-
   return (
     <Card className="h-full w-full flex flex-col">
       <CardHeader>
@@ -155,21 +225,23 @@ const Stations = () => {
       <CardContent className="flex gap-2 flex-1 min-h-0">
         <StationList
           stations={stations}
-          counters={counters}
-          selectedIndex={selectedStationIndex}
-          onSelect={setSelectedStationIndex}
-          onAddStation={handleAddStation}
+          selectedId={selectedStationId}
+          onSelect={setSelectedStationId}
+          onAddStation={addStation}
+          onDeleteStation={deleteStation}
+          onUpdateStation={updateStation}
         />
 
         <CounterList
-          counters={countersForSelected}
-          selectedStationIndex={selectedStationIndex}
+          stationId={selectedStationId!}
+          counters={counters}
+          selectedStationIndex={selectedStationId}
           employees={employees}
-          onAddCounter={
-            selectedStationIndex !== null ? handleAddCounter : undefined
-          }
-          onAssignEmployee={handleAssignEmployee}
-          onCloseCounter={handleCloseCounter}
+          availableEmployees={availableEmployees}
+          onAddCounter={addCounter}
+          onDeleteCounter={deleteCounter}
+          onAssignEmployee={() => {}}
+          onUpdateCounter={updateCounter}
         />
       </CardContent>
     </Card>

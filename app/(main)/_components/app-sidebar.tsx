@@ -170,6 +170,7 @@ export function AppSidebar() {
                 <DropdownMenuItem
                   onSelect={async () => {
                     await auth.signOut();
+                    localStorage.removeItem("token");
                     router.replace("/");
                   }}
                 >
@@ -178,7 +179,6 @@ export function AppSidebar() {
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
-        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

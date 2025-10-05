@@ -19,11 +19,9 @@ export const useVerifyUser = () => {
           const status = error.response?.status;
           switch (status) {
             case 401:
-              await auth.signOut();
-              router.replace("/forbidden");
-              break;
             case 403:
               await auth.signOut();
+              localStorage.removeItem("token");
               router.replace("/forbidden");
               break;
             case 404:

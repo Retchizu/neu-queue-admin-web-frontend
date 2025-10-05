@@ -9,11 +9,6 @@ import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-  title: "500 – Something Went Wrong",
-  description: "An unexpected error occurred. Please try again later.",
-};
-
 const GlobalError = ({
   error,
   reset,

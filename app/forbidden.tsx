@@ -9,10 +9,7 @@ import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-  title: "403 – Forbidden",
-  description: "You do not have permission to access this page.",
-};
+
 
 const ForbiddenPage = () => {
   return (

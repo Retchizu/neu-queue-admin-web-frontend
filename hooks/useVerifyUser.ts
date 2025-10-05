@@ -1,3 +1,5 @@
+"use client";
+
 import api from "@/lib/api";
 import { auth } from "@/lib/firebaseConfig";
 import { isAxiosError } from "axios";

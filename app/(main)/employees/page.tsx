@@ -37,7 +37,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// --- Demo Data & Types (copied from user's snippet) -----------------
 export type Payment = {
   id: string;
   amount: number;
@@ -78,7 +77,6 @@ const data_demo: Payment[] = [
   },
 ];
 
-// --- DataTableDemo component (module scope, uses project UI components) ---
 function DataTableDemo() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -312,8 +310,6 @@ function DataTableDemo() {
   );
 }
 
-// --- Original page UI (keeps user's header controls) -----------------
-
 export default function Page() {
   const [search, setSearch] = React.useState("");
 
@@ -332,7 +328,6 @@ export default function Page() {
           </Button>
         </div>
 
-        {/* Render the demo table here */}
         <DataTableDemo />
       </CardContent>
     </Card>

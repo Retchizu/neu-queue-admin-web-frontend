@@ -30,18 +30,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SidebarProvider open={true}>
-          <AppSidebar />
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            disableTransitionOnChange
-          >
-            <main className="w-full h-svh overflow-hidden flex flex-col">
-              <div className="flex-1 min-h-0 py-2">{children}</div>
-            </main>
-          </ThemeProvider>
-        </SidebarProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          disableTransitionOnChange
+        >
+          <main className="w-full h-svh overflow-hidden flex flex-col">
+            <div className="flex-1 min-h-0 py-2">{children}</div>
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );

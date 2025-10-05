@@ -67,7 +67,7 @@ const EmployeesPage = () => {
   const [search, setSearch] = useState("");
 
   return (
-    <Card className="h-full w-full">
+    <Card className="h-full w-full m-2">
       <CardContent className="flex flex-col h-full min-h-0">
         <div className="flex items-center gap-2 mb-4">
           <Input

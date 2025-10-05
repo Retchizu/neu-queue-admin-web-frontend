@@ -1,13 +1,11 @@
-import { useVerifyUser } from '@/hooks/useVerifyUser'
-import React from 'react'
+"use client";
+
+import { useVerifyUser } from "@/hooks/useVerifyUser";
+import React from "react";
 
 const Pending = () => {
   useVerifyUser();
-  return (
-    <div>
-      review-pending
-    </div>
-  )
-}
+  return <div>review-pending</div>;
+};
 
-export default Pending
+export default Pending;

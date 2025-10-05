@@ -7,6 +7,8 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarHeader,
+  SidebarGroupLabel,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -39,38 +41,55 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarMenu>
-            <Link href={"/employees"}>
-              <SidebarMenuButton>
-                <p className="font-medium">Employees</p>
-              </SidebarMenuButton>
-            </Link>
-            <Link href={"/station"}>
-              <SidebarMenuButton>
-                <p className="font-medium">Stations</p>
-              </SidebarMenuButton>
-            </Link>
-            <Link href={"/pending"}>
-              <SidebarMenuButton>
-                <p className="font-medium">Pending Accounts</p>
-              </SidebarMenuButton>
-            </Link>
-            <Link href={"/blacklist"}>
-              <SidebarMenuButton>
-                <p className="font-medium">Blacklisted</p>
-              </SidebarMenuButton>
-            </Link>
-            <Link href={"/logs"}>
-              <SidebarMenuButton>
-                <p className="font-medium">Activity Logs</p>
-              </SidebarMenuButton>
-            </Link>
-            <Link href={"/analytics"}>
-              <SidebarMenuButton>
-                <p className="font-medium">Analytics</p>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenu>
+          <SidebarGroupLabel>People</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <Link href={"/employees"}>
+                <SidebarMenuButton>
+                  <p className="font-medium">Employees</p>
+                </SidebarMenuButton>
+              </Link>
+              <Link href={"/station"}>
+                <SidebarMenuButton>
+                  <p className="font-medium">Stations</p>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <Link href={"/pending"}>
+                <SidebarMenuButton>
+                  <p className="font-medium">Pending Accounts</p>
+                </SidebarMenuButton>
+              </Link>
+              <Link href={"/blacklist"}>
+                <SidebarMenuButton>
+                  <p className="font-medium">Blacklisted</p>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Miscellaneous</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <Link href={"/logs"}>
+                <SidebarMenuButton>
+                  <p className="font-medium">Activity Logs</p>
+                </SidebarMenuButton>
+              </Link>
+              <Link href={"/analytics"}>
+                <SidebarMenuButton>
+                  <p className="font-medium">Analytics</p>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenu>
+          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>

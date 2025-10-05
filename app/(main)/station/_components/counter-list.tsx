@@ -31,9 +31,8 @@ type Props = {
     stationId: string,
     counterId: string,
     updatedData: Partial<Counter>
-  ) => void;
+  ) => Promise<void>;
   onDeleteCounter?: (stationId: string, counterId: string) => void;
-  onAssignEmployee: (counterUid: string, employeeId: string | null) => void;
 };
 
 export default function CounterList({
@@ -45,7 +44,6 @@ export default function CounterList({
   onAddCounter,
   onUpdateCounter,
   onDeleteCounter,
-  onAssignEmployee,
 }: Props) {
   return (
     <Card className="flex-1 min-h-0 h-full flex flex-col">
@@ -86,7 +84,6 @@ export default function CounterList({
                   counter={counter}
                   employees={employees}
                   availableEmployees={availableEmployees}
-                  onAssignEmployee={onAssignEmployee}
                 >
                   <Card className="cursor-pointer hover:bg-muted/50 transition-colors mb-2">
                     <CardContent className="flex flex-col justify-between h-20">
@@ -102,6 +99,7 @@ export default function CounterList({
                         >
                           {onUpdateCounter && (
                             <EditCounterDialog
+                              availableEmployees={availableEmployees}
                               counter={counter}
                               stationId={stationId}
                               onUpdateCounter={onUpdateCounter}

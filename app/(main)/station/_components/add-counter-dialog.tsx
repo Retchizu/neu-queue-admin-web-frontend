@@ -44,7 +44,7 @@ const AddCounterDialog = ({
   };
 
   const handleCreate = async () => {
-    await onAddCounter(stationId, {counterNumber: counterNumber});
+    await onAddCounter(stationId, {counterNumber: counterNumber, uid: employeeId! });
     setOpen(false);
     // optional: reset form
     setEmployeeId(null);

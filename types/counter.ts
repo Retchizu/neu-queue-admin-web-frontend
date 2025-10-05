@@ -1,4 +1,5 @@
 type Counter = {
+  id: string;
   counterNumber: number;
   stationID: string;
   uid: string;

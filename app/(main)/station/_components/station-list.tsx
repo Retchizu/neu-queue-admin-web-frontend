@@ -8,26 +8,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import type Station from "@/types/station";
-import type Counter from "@/types/counter";
 import AddStationDialog from "./add-station-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { PartialStation } from "@/types/station";
+
+import DeleteStationDialog from "./delete-station-dialog";
+import UpdateStationDialog from "./update-station-dialog";
 
 type Props = {
   stations: Station[];
-  counters: Counter[];
-  selectedIndex: number | null;
-  onSelect: (index: number) => void;
-  onAddStation?: (newStation: Station) => void;
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  onAddStation?: (newStation: PartialStation) => void;
+  onDeleteStation?: (id: string) => void;
+  onUpdateStation?: (updatedStation: PartialStation) => void;
 };
 
 const StationList = ({
   stations,
-  counters,
-  selectedIndex,
+  selectedId,
   onSelect,
   onAddStation,
+  onDeleteStation,
+  onUpdateStation,
 }: Props) => {
   return (
     <Card className="flex-1 min-h-0 h-full flex flex-col">
@@ -41,25 +45,37 @@ const StationList = ({
 
       <CardContent className="flex-1 min-h-0 p-0">
         <ScrollArea className="h-full w-full p-2">
-          {stations.map((s, idx) => {
-            const stationId = `station-${idx}`;
-            const count = counters.filter(
-              (c) => c.stationID === stationId
-            ).length;
-
+          {stations.map((s) => {
+            const stationId = s.id;
             return (
               <Card
-                key={`${s.name}-${idx}`}
+                key={s.id}
                 className={`cursor-pointer hover:bg-muted/50 transition-colors mb-2 ${
-                  selectedIndex === idx ? "bg-muted/80" : ""
+                  selectedId === s.id ? "bg-muted/80" : ""
                 }`}
-                onClick={() => onSelect(idx)}
+                onClick={() => onSelect(stationId)}
               >
-                <CardContent className="flex flex-col justify-between h-20">
-                  <div className="font-medium text-lg">{s.name}</div>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="truncate">{s.description}</div>
-                    <Badge variant="secondary">{count} counters</Badge>
+                <CardContent className="flex items-center justify-between h-20">
+                  <div className="flex flex-col overflow-hidden">
+                    <div className="font-medium text-lg truncate">{s.name}</div>
+                    <div className="text-sm text-muted-foreground truncate">
+                      {s.description}
+                    </div>
+                  </div>
+
+                  <div>
+                    {selectedId === s.id && onUpdateStation && (
+                      <UpdateStationDialog
+                        station={s}
+                        onSave={onUpdateStation}
+                      />
+                    )}
+                     {selectedId === s.id && onDeleteStation && (
+                      <DeleteStationDialog
+                        stationName={s.name}
+                        onConfirm={() => onDeleteStation(stationId)}
+                      />
+                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -15,39 +15,46 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import type CashierType from "@/types/CashierType";
+import { PartialStation } from "@/types/station";
+import { Pencil } from "lucide-react";
 
 import { saveStation } from "@/app/(main)/station/utils/stationHandlers";
-import { PartialStation } from "@/types/station";
-
-const defaultStation: PartialStation = {
-  name: "",
-  description: "",
-  type: "payment",
-  activated: true,
-};
 
 type Props = {
-  onSave?: (station: PartialStation) => void;
+  station: PartialStation; // prefilled data
+  onSave?: (updatedStation: PartialStation) => void;
 };
 
-const AddStationDialog = ({ onSave }: Props) => {
+const UpdateStationDialog = ({ station, onSave }: Props) => {
   const [open, setOpen] = React.useState(false);
-  const [station, setStation] = React.useState<PartialStation>(defaultStation);
+  const [editedStation, setEditedStation] =
+    React.useState<PartialStation>(station);
 
-  const handleSave = () =>
-    saveStation(station, onSave, setOpen, setStation, defaultStation);
+  const handleUpdate = () =>
+    saveStation(editedStation, onSave, setOpen, setEditedStation, station);
+
+  React.useEffect(() => {
+    setEditedStation(station);
+  }, [station]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size={"sm"}>Add Station</Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground hover:text-blue-500"
+          onClick={(e) => e.stopPropagation()} // prevent select click
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Station</DialogTitle>
+          <DialogTitle>Update Station</DialogTitle>
           <DialogDescription>
-            Add a new station to the system.
+            Modify details for <b>{station.name}</b>.
           </DialogDescription>
         </DialogHeader>
 
@@ -58,8 +65,10 @@ const AddStationDialog = ({ onSave }: Props) => {
             </label>
             <Input
               id="station-name"
-              value={station.name}
-              onChange={(e) => setStation({ ...station, name: e.target.value })}
+              value={editedStation.name}
+              onChange={(e) =>
+                setEditedStation({ ...editedStation, name: e.target.value })
+              }
             />
           </div>
 
@@ -69,9 +78,12 @@ const AddStationDialog = ({ onSave }: Props) => {
             </label>
             <Textarea
               id="station-desc"
-              value={station.description}
+              value={editedStation.description}
               onChange={(e) =>
-                setStation({ ...station, description: e.target.value })
+                setEditedStation({
+                  ...editedStation,
+                  description: e.target.value,
+                })
               }
             />
           </div>
@@ -83,9 +95,12 @@ const AddStationDialog = ({ onSave }: Props) => {
             <select
               id="station-type"
               className="rounded-md border px-2 py-1"
-              value={station.type}
+              value={editedStation.type}
               onChange={(e) =>
-                setStation({ ...station, type: e.target.value as CashierType })
+                setEditedStation({
+                  ...editedStation,
+                  type: e.target.value as CashierType,
+                })
               }
             >
               <option value="payment">Payment</option>
@@ -98,9 +113,9 @@ const AddStationDialog = ({ onSave }: Props) => {
           <div className="flex items-center gap-2">
             <Checkbox
               id="station-activated"
-              checked={station.activated}
+              checked={editedStation.activated}
               onCheckedChange={(v) =>
-                setStation({ ...station, activated: !!v })
+                setEditedStation({ ...editedStation, activated: !!v })
               }
             />
             <label htmlFor="station-activated">Activated</label>
@@ -112,7 +127,7 @@ const AddStationDialog = ({ onSave }: Props) => {
             <Button variant="ghost" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave}>Save</Button>
+            <Button onClick={handleUpdate}>Save Changes</Button>
           </div>
         </DialogFooter>
       </DialogContent>
@@ -120,4 +135,4 @@ const AddStationDialog = ({ onSave }: Props) => {
   );
 };
 
-export default AddStationDialog;
+export default UpdateStationDialog;

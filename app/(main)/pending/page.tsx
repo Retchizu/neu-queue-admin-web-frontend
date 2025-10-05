@@ -63,7 +63,7 @@ const Pending = () => {
         email,
         role,
         createdAt,
-      } as Employee;
+      } as unknown as Employee;
     });
   }, []);
 

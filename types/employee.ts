@@ -1,7 +1,7 @@
 export type Employee = {
-  id: string;
-  name: string;
+  uid:string,
+  displayName: string;
   email: string;
-  role: "Admin" | "Cashier" | "Information";
+  role: string;
   createdAt: string;
 };

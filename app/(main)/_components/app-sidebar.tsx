@@ -1,3 +1,6 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -7,9 +10,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { auth } from "@/lib/firebaseConfig";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function AppSidebar() {
+  const router = useRouter();
   return (
     <Sidebar variant="floating">
       <SidebarHeader>
@@ -54,7 +60,14 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuButton>
-            <p className="font-medium">Logout</p>
+            <Button
+              onClick={async () => {
+                await auth.signOut();
+                router.replace("/");
+              }}
+            >
+              Logout
+            </Button>
           </SidebarMenuButton>
         </SidebarMenu>
       </SidebarFooter>

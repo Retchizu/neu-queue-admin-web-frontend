@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 const Blacklist = () => {
-  // useVerifyUser();
+  useVerifyUser();
   const employees: Employee[] = React.useMemo(() => {
     const roles: Employee["role"][] = ["Admin", "Cashier", "Information"];
     const firstNames = [

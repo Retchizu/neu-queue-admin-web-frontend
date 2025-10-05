@@ -57,7 +57,7 @@ const mockEmployees: Cashier[] = [
 ];
 
 const Stations = () => {
-  // useVerifyUser();
+  useVerifyUser();
   const [stations, setStations] = React.useState<Station[]>(initialStations);
   const [counters, setCounters] = React.useState<Counter[]>(initialCounters);
   const [employees] = React.useState(mockEmployees);

@@ -9,7 +9,7 @@ import { useVerifyUser } from "@/hooks/useVerifyUser";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const EmployeesPage = () => {
-  // useVerifyUser();
+  useVerifyUser();
   const employees: Employee[] = React.useMemo(() => {
     const roles: Employee["role"][] = ["Admin", "Cashier", "Information"];
     const firstNames = [

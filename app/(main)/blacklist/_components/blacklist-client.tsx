@@ -23,6 +23,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 interface Props {
   employees: Employee[];
@@ -57,6 +58,7 @@ export default function BlacklistClient({
   function confirmRemove() {
     if (!pendingEmail) return;
     handleRemove(pendingEmail);
+    toast.success("Removed from blacklist");
     setConfirmOpen(false);
     setPendingEmail(null);
   }

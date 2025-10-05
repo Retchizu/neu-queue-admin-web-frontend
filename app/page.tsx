@@ -6,6 +6,8 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import api from "@/lib/api";
 import { isAxiosError } from "axios";
 import { FirebaseError } from "firebase/app";
+import Image from "next/image";
+import neuLogo from "@/public/neu-logo.png";
 
 export default function Home() {
   const handleLogin = async () => {
@@ -28,11 +30,17 @@ export default function Home() {
     }
   };
   return (
-    <div>
+    <div className="flex items-center justify-center min-h-screen flex-col">
+      <Image src={neuLogo} alt="neu-logo" className="h-50 w-50 mb-10" />
+      <h1 className="text-4xl font-semibold text-center">Welcome to NEUQueue</h1>
+      <p className="text-center">
+        NEUQUEUE brings smart queuing to New Era University Say goodbye to long
+        lines.{" "}
+      </p>
       <Button
         onClick={async () => await handleLogin()}
         variant="outline"
-        className="w-full flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-100"
+        className="w-full max-w-xs flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 mt-10"
       >
         <FaGoogle color="red" />
         <span className="text-sm font-medium text-gray-700">

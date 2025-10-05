@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Employee } from "@/types/employee";
 import React, { useState } from "react";
 import EmployeesClient from "./_components/employees-client";
+import { useVerifyUser } from "@/hooks/useVerifyUser";
 
 const EmployeesPage = () => {
+  useVerifyUser()
   const employees: Employee[] = [
     {
       id: "e_01",

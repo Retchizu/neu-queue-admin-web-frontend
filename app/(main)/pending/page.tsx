@@ -1,6 +1,8 @@
+import { useVerifyUser } from '@/hooks/useVerifyUser'
 import React from 'react'
 
-const page = () => {
+const Pending = () => {
+  useVerifyUser();
   return (
     <div>
       review-pending
@@ -8,4 +10,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Pending

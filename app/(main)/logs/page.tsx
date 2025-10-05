@@ -1,13 +1,14 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import LogsClient from "./_components/logs-client";
 import { ActivityLog, ActionType } from "@/types/log";
+import { useVerifyUser } from "@/hooks/useVerifyUser";
 
-const LogsPage = () => {
+const Activity = () => {
+  useVerifyUser();
   const [search, setSearch] = useState("");
 
   const logs: ActivityLog[] = [
@@ -53,4 +54,4 @@ const LogsPage = () => {
   );
 };
 
-export default LogsPage;
+export default Activity;

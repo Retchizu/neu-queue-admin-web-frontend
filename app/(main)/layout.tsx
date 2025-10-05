@@ -7,7 +7,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
     <SidebarProvider open={true}>
       <AppSidebar />
       <main className="w-full h-svh overflow-hidden flex flex-col">
-        <div className="flex-1 min-h-0">{children}</div>
+        <div className="flex-1 min-h-0 p-2">{children}</div>
       </main>
     </SidebarProvider>
   );

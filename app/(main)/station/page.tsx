@@ -107,8 +107,9 @@ const Stations = () => {
   useEffect(() => {
     const getCounterEmployee = async () => {
       try {
+        // only include counters with a non-empty uid
         const filteredCounters = counters.filter(
-          (c) => c.uid !== undefined && c.uid !== null
+          (c) => c.uid && String(c.uid).trim() !== ""
         );
         const promises = filteredCounters.map((c) =>
           api.get(`admin/user-data/${c.uid}`)
@@ -241,7 +242,9 @@ const Stations = () => {
       );
       setCounters((prevCounters) =>
         prevCounters.map((prev) =>
-          prev.id === counterId ? { ...prev, ...response.data.counter } : prev
+          prev.id === counterId
+            ? { ...prev, ...response.data.counter, ...updatedCounter }
+            : prev
         )
       );
       if (response.data?.message) toast.success(response.data.message);

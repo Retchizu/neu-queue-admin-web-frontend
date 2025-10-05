@@ -24,6 +24,7 @@ interface Props {
   counter: Counter;
   employees: Employee[];
   availableEmployees: Employee[];
+  onAssign?: (counterId: string, uid: string | null) => Promise<void> | void;
 }
 
 export default function AssignCashierDialog({
@@ -31,13 +32,13 @@ export default function AssignCashierDialog({
   counter,
   employees,
   availableEmployees,
+  onAssign,
 }: Props) {
   const [open, setOpen] = useState(false);
 
   // find assigned employee object (if any)
   const assignedEmployee =
     employees.find((emp) => emp.uid === counter.uid) || null;
-
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -101,6 +102,18 @@ export default function AssignCashierDialog({
                               <p className="text-xs text-muted-foreground">
                                 {employee.role}
                               </p>
+                            </div>
+                            <div>
+                              <Button
+                                size="sm"
+                                onClick={async () => {
+                                  if (onAssign)
+                                    await onAssign(counter.id, employee.uid);
+                                  setOpen(false);
+                                }}
+                              >
+                                Assign
+                              </Button>
                             </div>
                           </div>
                         ))}

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Pencil } from "lucide-react";
 import {
   Popover,
@@ -44,18 +45,26 @@ const EditCounterDialog = ({
     counterNumber: counter.counterNumber,
     uid: counter.uid || "",
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleUpdate = async () => {
-    await onUpdateCounter(stationId, counter.id, {
-      counterNumber: formData.counterNumber,
-      uid: formData.uid,
-    });
-    setOpen(false);
+    try {
+      setIsSaving(true);
+      await onUpdateCounter(stationId, counter.id, {
+        counterNumber: formData.counterNumber,
+        uid: formData.uid,
+      });
+      setOpen(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  
   const handleSelectEmployee = (uid: string | null) => {
     setFormData((prev) => ({ ...prev, uid: uid || "" }));
+    // close the popover after selection
+    setIsPopoverOpen(false);
   };
 
   return (
@@ -109,11 +118,12 @@ const EditCounterDialog = ({
             <label className="block mb-2 text-sm font-medium">
               Assign Cashier
             </label>
-            <Popover>
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-between">
                   {formData.uid
-                    ? availableEmployees.find((e) => e.uid === formData.uid)?.displayName
+                    ? availableEmployees.find((e) => e.uid === formData.uid)
+                        ?.displayName
                     : "Select cashier"}
                 </Button>
               </PopoverTrigger>
@@ -124,7 +134,7 @@ const EditCounterDialog = ({
                       className="w-full text-left text-sm text-muted-foreground p-2 hover:bg-muted rounded"
                       onClick={() => handleSelectEmployee(null)}
                     >
-                      None (Unassign)
+                      Unassign
                     </button>
                     {availableEmployees.map((emp) => (
                       <div
@@ -154,10 +164,16 @@ const EditCounterDialog = ({
 
         <DialogFooter>
           <div className="flex w-full justify-end gap-2">
-            <Button variant="ghost" onClick={() => setOpen(false)}>
+            <Button
+              variant="ghost"
+              onClick={() => setOpen(false)}
+              disabled={isSaving}
+            >
               Cancel
             </Button>
-            <Button onClick={handleUpdate}>Save</Button>
+            <Button onClick={handleUpdate} disabled={isSaving}>
+              {isSaving ? <Spinner /> : "Save"}
+            </Button>
           </div>
         </DialogFooter>
       </DialogContent>

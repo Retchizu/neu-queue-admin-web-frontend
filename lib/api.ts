@@ -8,19 +8,30 @@ const api = axios.create({
   },
 });
 
-// 🧩 REQUEST INTERCEPTOR
-api.interceptors.request.use(async (config) => {
+const getToken = async () => {
   const user = auth.currentUser;
 
   if (user) {
     const token = await user.getIdToken();
+    if (typeof window !== "undefined") localStorage.setItem("token", token);
+    return token;
+  } else if (typeof window !== "undefined") {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) return storedToken;
+  }
 
+  return "";
+};
+
+// 🧩 REQUEST INTERCEPTOR
+api.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  if (token) {
     config.headers = AxiosHeaders.from({
       ...(config.headers || {}),
       Authorization: `Bearer ${token}`,
     });
   }
-
   return config;
 });
 
@@ -40,19 +51,16 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const user = auth.currentUser;
-        if (user) {
-          // Force refresh Firebase ID token
-          const newToken = await user.getIdToken(true);
-
+        const newToken = await getToken();
+        if (newToken) {
           originalRequest.headers = AxiosHeaders.from({
             ...(originalRequest.headers || {}),
             Authorization: `Bearer ${newToken}`,
           });
-
-          // Retry the failed request with new token
-          return api(originalRequest);
         }
+
+        // Retry the failed request with new token
+        return api(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
       }

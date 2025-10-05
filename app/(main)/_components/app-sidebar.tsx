@@ -63,6 +63,7 @@ export function AppSidebar() {
             <Button
               onClick={async () => {
                 await auth.signOut();
+                localStorage.removeItem("token");
                 router.replace("/");
               }}
             >

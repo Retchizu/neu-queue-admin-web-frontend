@@ -9,14 +9,27 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Employee } from "@/types/employee";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EmployeesClient from "./_components/employees-client";
-import { useVerifyUser } from "@/hooks/useVerifyUser";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import api from "@/lib/api";
 
 const EmployeesPage = () => {
-  useVerifyUser();
-  const employees: Employee[] = React.useMemo(() => {
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  useEffect(() => {
+    const getEmployees = async () => {
+      try {
+        const response = await api.get("/admin/employees");
+        setEmployees(response.data.employees);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getEmployees();
+  }, []);
+  console.log(employees);
+
+  /* const employees: Employee[] = React.useMemo(() => {
     const roles: Employee["role"][] = ["Admin", "Cashier", "Information"];
     const firstNames = [
       "Kenji",
@@ -68,9 +81,9 @@ const EmployeesPage = () => {
       } as Employee;
     });
   }, []);
-
+ */
   const [search, setSearch] = useState("");
-
+  
   return (
     <Card className="h-full w-full">
       <CardHeader>

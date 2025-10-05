@@ -12,10 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Employee } from "@/types/employee";
 import PendingClient from "./_components/pending-client";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useVerifyUser } from "@/hooks/useVerifyUser";
 
 const Pending = () => {
-  useVerifyUser();
   const employees: Employee[] = React.useMemo(() => {
     const roles: Employee["role"][] = ["Admin", "Cashier", "Information"];
     const firstNames = [

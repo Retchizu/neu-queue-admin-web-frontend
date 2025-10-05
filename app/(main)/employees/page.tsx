@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Employee } from "@/types/employee";
 import React, { useState } from "react";
@@ -67,6 +73,12 @@ const EmployeesPage = () => {
 
   return (
     <Card className="h-full w-full">
+      <CardHeader>
+        <CardTitle>Employee Management</CardTitle>
+        <CardDescription>
+          Assign roles to each users for the system.
+        </CardDescription>
+      </CardHeader>
       <CardContent className="flex flex-col h-full min-h-0">
         <div className="flex items-center gap-2 mb-4">
           <Input

@@ -30,11 +30,11 @@ const chartData = [
 
 const chartConfig = {
   desktop: {
-    label: "Desktop",
+    label: "Old students",
     color: "var(--chart-1)",
   },
   mobile: {
-    label: "Mobile",
+    label: "New studentds",
     color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
@@ -93,10 +93,11 @@ const AnalyticsChart = () => {
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 leading-none font-medium">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+              Users have increased by 5.4% this month.{" "}
+              <TrendingUp className="h-4 w-4" />
             </div>
             <div className="text-muted-foreground flex items-center gap-2 leading-none">
-              January - June 2024
+              September - October 2025
             </div>
           </div>
         </div>

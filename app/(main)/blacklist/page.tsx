@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Employee } from "@/types/employee";
 import BlacklistClient from "./_components/blacklist-client";
@@ -114,6 +120,12 @@ const Blacklist = () => {
 
   return (
     <Card className="h-full w-full">
+      <CardHeader>
+        <CardTitle>Blacklisted Users</CardTitle>
+        <CardDescription>
+          Here you can find users who used the system inappropriately.
+        </CardDescription>
+      </CardHeader>
       <CardContent className="flex flex-col h-full min-h-0">
         <div className="flex items-center gap-2 mb-4">
           <Input

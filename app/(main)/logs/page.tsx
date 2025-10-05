@@ -1,6 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import LogsClient from "./_components/logs-client";
@@ -77,6 +83,12 @@ const Activity = () => {
 
   return (
     <Card className="h-full w-full">
+      <CardHeader>
+        <CardTitle>Activity Logs</CardTitle>
+        <CardDescription>
+          These are all the event logs that happened within the system.
+        </CardDescription>
+      </CardHeader>
       <CardContent className="flex flex-col h-full min-h-0">
         <div className="flex items-center gap-2 mb-4">
           <Input

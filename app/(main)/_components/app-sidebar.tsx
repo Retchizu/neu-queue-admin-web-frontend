@@ -1,6 +1,5 @@
 "use client";
 
-// Button not needed in this file anymore
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -30,6 +30,7 @@ import neuLogo from "@/public/neu-logo.png";
 
 export function AppSidebar() {
   const router = useRouter();
+  const { setTheme } = useTheme();
   const user = auth.currentUser;
   return (
     <Sidebar variant="floating">
@@ -93,7 +94,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
+        <SidebarMenu className="flex items-center gap-2">
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -154,6 +155,17 @@ export function AppSidebar() {
                     </div>
                   </div>
                 </DropdownMenuLabel>
+
+                <DropdownMenuItem onSelect={() => setTheme("light")}>
+                  Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setTheme("dark")}>
+                  Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setTheme("system")}>
+                  System
+                </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={async () => {

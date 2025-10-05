@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosHeaders } from "axios";
-import { auth } from "@/firebaseConfig"; // adjust path if needed
+import { auth } from "@/lib/firebaseConfig";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_CUID_REQUEST_URL,

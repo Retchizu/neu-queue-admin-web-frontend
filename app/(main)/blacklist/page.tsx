@@ -1,11 +1,9 @@
-import React from 'react'
+import { useVerifyUser } from "@/hooks/useVerifyUser";
+import React from "react";
 
-const page = () => {
-  return (
-    <div>
-      blacklisted
-    </div>
-  )
-}
+const Blacklist = () => {
+  useVerifyUser();
+  return <div>blacklisted</div>;
+};
 
-export default page
+export default Blacklist;

@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "NQueue Admin",
-  description: "Admin console for NQueue.",
+  description: "Admin console for NEUQueue.",
 };
 
 export default function RootLayout({

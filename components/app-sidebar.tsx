@@ -8,10 +8,11 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { Button } from "./ui/button";
 
 export function AppSidebar() {
   return (
-    <Sidebar>
+    <Sidebar variant="floating">
       <SidebarHeader>
         <h3>NQueue</h3>
       </SidebarHeader>
@@ -46,7 +47,13 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuButton>
+            <p className="font-medium">Logout</p>
+          </SidebarMenuButton>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

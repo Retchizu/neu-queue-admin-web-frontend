@@ -6,38 +6,78 @@ import React, { useState } from "react";
 import LogsClient from "./_components/logs-client";
 import { ActivityLog, ActionType } from "@/types/log";
 import { useVerifyUser } from "@/hooks/useVerifyUser";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Activity = () => {
   useVerifyUser();
   const [search, setSearch] = useState("");
 
-  const logs: ActivityLog[] = [
-    {
-      id: "l_01",
-      userId: "e_01",
-      action: ActionType.LOG_IN,
-      timestamp: Date.now() - 1000 * 60 * 60,
-      details: "User logged in",
-    },
-    {
-      id: "l_02",
-      userId: "e_02",
-      action: ActionType.JOIN_QUEUE,
-      timestamp: Date.now() - 1000 * 60 * 30,
-      details: "Joined service A",
-    },
-    {
-      id: "l_03",
-      userId: "e_03",
-      action: ActionType.SERVE_CUSTOMER,
-      timestamp: Date.now() - 1000 * 60 * 5,
-      details: "Served ticket #42",
-    },
-  ];
+  const logs: ActivityLog[] = React.useMemo(() => {
+    const actions = [
+      ActionType.LOG_IN,
+      ActionType.LOG_OUT,
+      ActionType.JOIN_QUEUE,
+      ActionType.LEAVE_QUEUE,
+      ActionType.SERVE_CUSTOMER,
+      ActionType.SKIP_CUSTOMER,
+      ActionType.COMPLETE_TRANSACTION,
+      ActionType.ASSIGN_ROLE,
+      ActionType.BLOCK_EMAIL,
+      ActionType.UNBLOCK_EMAIL,
+    ];
+
+    const detailsByAction: Record<string, string[]> = {
+      [ActionType.LOG_IN]: [
+        "User logged in",
+        "Login via SSO",
+        "Password login",
+      ],
+      [ActionType.LOG_OUT]: ["User logged out"],
+      [ActionType.JOIN_QUEUE]: [
+        "Joined service A",
+        "Joined service B",
+        "Joined VIP queue",
+      ],
+      [ActionType.LEAVE_QUEUE]: ["Left queue before service"],
+      [ActionType.SERVE_CUSTOMER]: [
+        "Served ticket #42",
+        "Served ticket #7",
+        "Served VIP customer",
+      ],
+      [ActionType.SKIP_CUSTOMER]: ["Skipped ticket #13"],
+      [ActionType.COMPLETE_TRANSACTION]: [
+        "Completed payment",
+        "Completed refund",
+      ],
+      [ActionType.ASSIGN_ROLE]: [
+        "Assigned role: admin",
+        "Assigned role: attendant",
+      ],
+      [ActionType.BLOCK_EMAIL]: ["Blocked user@example.com"],
+      [ActionType.UNBLOCK_EMAIL]: ["Unblocked user@example.com"],
+    };
+
+    const count = 50;
+    const now = Date.now();
+
+    return Array.from({ length: count }).map((_, i) => {
+      const action = actions[i % actions.length];
+      const detailsOptions = detailsByAction[action] ?? ["Action performed"];
+      const details = detailsOptions[i % detailsOptions.length];
+      return {
+        id: `l_${String(i + 1).padStart(3, "0")}`,
+        userId: `e_${String((i % 12) + 1).padStart(3, "0")}`,
+        action,
+        timestamp: now - i * 1000 * 60 * 2,
+        details,
+        metadata: { seq: i + 1 },
+      } as ActivityLog;
+    });
+  }, []);
 
   return (
     <Card className="h-full w-full">
-      <CardContent className="">
+      <CardContent className="flex flex-col h-full min-h-0">
         <div className="flex items-center gap-2 mb-4">
           <Input
             type="text"
@@ -48,7 +88,10 @@ const Activity = () => {
           />
           <Button className="ml-auto">Export</Button>
         </div>
-        <LogsClient logs={logs} search={search} />
+
+        <ScrollArea className="flex-1 min-h-0">
+          <LogsClient logs={logs} search={search} />
+        </ScrollArea>
       </CardContent>
     </Card>
   );

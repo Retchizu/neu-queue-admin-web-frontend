@@ -7,52 +7,68 @@ import { Employee } from "@/types/employee";
 import React, { useState } from "react";
 import EmployeesClient from "./_components/employees-client";
 import { useVerifyUser } from "@/hooks/useVerifyUser";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const EmployeesPage = () => {
-  useVerifyUser()
-  const employees: Employee[] = [
-    {
-      id: "e_01",
-      name: "Kenji Nakamura",
-      email: "kenji.nakamura@neu.edu.ph",
-      role: "Admin",
-      createdAt: "2024-09-01T10:12:34.000Z",
-    },
-    {
-      id: "e_02",
-      name: "Abe Johnson",
-      email: "abe.johnson@neu.edu.ph",
-      role: "Cashier",
-      createdAt: "2024-11-15T08:25:00.000Z",
-    },
-    {
-      id: "e_03",
-      name: "Monserrat Diaz",
-      email: "monserrat.diaz@neu.edu.ph",
-      role: "Information",
-      createdAt: "2025-02-20T14:05:12.000Z",
-    },
-    {
-      id: "e_04",
-      name: "Silas Bennett",
-      email: "silas.bennett@neu.edu.ph",
-      role: "Cashier",
-      createdAt: "2025-05-03T09:40:00.000Z",
-    },
-    {
-      id: "e_05",
-      name: "Carmella Ruiz",
-      email: "carmella.ruiz@neu.edu.ph",
-      role: "Information",
-      createdAt: "2025-07-22T19:18:45.000Z",
-    },
-  ];
+  useVerifyUser();
+  const employees: Employee[] = React.useMemo(() => {
+    const roles: Employee["role"][] = ["Admin", "Cashier", "Information"];
+    const firstNames = [
+      "Kenji",
+      "Abe",
+      "Monserrat",
+      "Silas",
+      "Carmella",
+      "Lina",
+      "Rico",
+      "Nadia",
+      "Oscar",
+      "Bea",
+      "Hector",
+      "Maya",
+    ];
+    const lastNames = [
+      "Nakamura",
+      "Johnson",
+      "Diaz",
+      "Bennett",
+      "Ruiz",
+      "Lopez",
+      "Garcia",
+      "Santos",
+      "Reyes",
+      "Tan",
+      "Cruz",
+      "Delgado",
+    ];
+
+    const count = 50;
+    const now = Date.now();
+
+    return Array.from({ length: count }).map((_, i) => {
+      const fn = firstNames[i % firstNames.length];
+      const ln = lastNames[i % lastNames.length];
+      const name = `${fn} ${ln}`;
+      const id = `e_${String(i + 1).padStart(3, "0")}`;
+      const role = roles[i % roles.length];
+      const createdAt = new Date(now - i * 1000 * 60 * 60 * 24).toISOString(); // 1 day apart
+      const email = `${fn.toLowerCase()}.${ln.toLowerCase()}@neu.edu.ph`;
+
+      return {
+        id,
+        name,
+        email,
+        role,
+        createdAt,
+      } as Employee;
+    });
+  }, []);
 
   const [search, setSearch] = useState("");
 
   return (
     <Card className="h-full w-full">
-      <CardContent className="">
+      <CardContent className="flex flex-col h-full min-h-0">
         <div className="flex items-center gap-2 mb-4">
           <Input
             type="text"
@@ -63,7 +79,9 @@ const EmployeesPage = () => {
           />
           <Button className="ml-auto">Add employee</Button>
         </div>
-        <EmployeesClient employees={employees} search={search} />
+        <ScrollArea className="flex-1 min-h-0">
+          <EmployeesClient employees={employees} search={search} />
+        </ScrollArea>
       </CardContent>
     </Card>
   );

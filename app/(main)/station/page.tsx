@@ -1,11 +1,10 @@
-import React from 'react'
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import React from "react";
 
 const page = () => {
-  return (
-    <div>
-      manage-station
-    </div>
-  )
-}
+  return <Card className="h-full w-full"></Card>;
+};
 
-export default page
+export default page;

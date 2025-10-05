@@ -57,7 +57,7 @@ export default function CounterList({
         <CardTitle>Counters</CardTitle>
         <CardDescription className="flex items-center justify-between">
           Total count: {counters.length}
-          {onAddCounter && (
+          {onAddCounter && selectedStationIndex !== null && (
             <AddCounterDialog
               stationId={stationId}
               employees={employees}

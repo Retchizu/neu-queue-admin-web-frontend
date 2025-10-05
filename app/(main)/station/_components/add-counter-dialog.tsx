@@ -54,7 +54,9 @@ const AddCounterDialog = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary">Add Counter</Button>
+        <Button variant="outline" className="border border-[var(--primary)]">
+          Add Counter
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -137,7 +139,9 @@ const AddCounterDialog = ({
             <Button variant="ghost" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button onClick={async() => await handleCreate()}>Create Counter</Button>
+            <Button onClick={async () => await handleCreate()}>
+              Create Counter
+            </Button>
           </div>
         </DialogFooter>
       </DialogContent>

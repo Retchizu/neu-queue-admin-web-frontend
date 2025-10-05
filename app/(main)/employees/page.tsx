@@ -53,6 +53,7 @@ const EmployeesPage = () => {
       <CardContent className="">
         <div className="flex items-center gap-2 mb-4">
           <Input
+            type="text"
             placeholder="Search for employees..."
             className="flex-1"
             value={search}
@@ -60,11 +61,7 @@ const EmployeesPage = () => {
           />
           <Button className="ml-auto">Add employee</Button>
         </div>
-        <EmployeesClient
-          employees={employees}
-          search={search}
-          currentUserRole={"Admin"}
-        />
+        <EmployeesClient employees={employees} search={search} />
       </CardContent>
     </Card>
   );

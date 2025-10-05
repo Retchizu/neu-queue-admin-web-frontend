@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { isAxiosError } from "axios";
 import StationList from "./_components/station-list";
 import CounterList from "./_components/counter-list";
 import type Station from "@/types/station";
@@ -73,6 +74,11 @@ const Stations = () => {
         const response = await api.get("/station/get");
         setStations(response.data.cashierLocationList);
       } catch (error) {
+        if (isAxiosError(error) && error.response) {
+          toast.error(error.response.data?.message ?? (error as Error).message);
+        } else {
+          toast.error((error as Error).message);
+        }
         console.error(error);
       }
     };
@@ -87,6 +93,11 @@ const Stations = () => {
         const response = await api.get(`/counter/get/${selectedStationId}`);
         setCounters(response.data.counterList);
       } catch (error) {
+        if (isAxiosError(error) && error.response) {
+          toast.error(error.response.data?.message ?? (error as Error).message);
+        } else {
+          toast.error((error as Error).message);
+        }
         console.error(error);
       }
     };
@@ -108,6 +119,11 @@ const Stations = () => {
         const result = responses.map((res) => res.data.userData);
         setEmployees(result);
       } catch (error) {
+        if (isAxiosError(error) && error.response) {
+          toast.error(error.response.data?.message ?? (error as Error).message);
+        } else {
+          toast.error((error as Error).message);
+        }
         console.error("Failed to fetch counter employees:", error);
       }
     };
@@ -123,6 +139,11 @@ const Stations = () => {
         const response = await api.get("/admin/available-cashier-employees");
         setAvailableEmployees(response.data.availableCashiers);
       } catch (error) {
+        if (isAxiosError(error) && error.response) {
+          toast.error(error.response.data?.message ?? (error as Error).message);
+        } else {
+          toast.error((error as Error).message);
+        }
         console.error(error);
       }
     };
@@ -133,8 +154,13 @@ const Stations = () => {
     try {
       const response = await api.post("/station/add", newStation);
       setStations((prev) => [...prev, response.data.station]);
-      toast.success(`${response.data.message}`);
+      if (response.data?.message) toast.success(response.data.message);
     } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        toast.error(error.response.data?.message ?? (error as Error).message);
+      } else {
+        toast.error((error as Error).message);
+      }
       console.error(error);
     }
   };
@@ -157,8 +183,12 @@ const Stations = () => {
 
       toast.success("Station updated successfully!");
     } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        toast.error(error.response.data?.message ?? (error as Error).message);
+      } else {
+        toast.error((error as Error).message);
+      }
       console.error("Failed to update station:", error);
-      toast.error("Failed to update station.");
     }
   };
 
@@ -166,8 +196,13 @@ const Stations = () => {
     try {
       const response = await api.delete(`/station/delete/${stationId}`);
       setStations(stations.filter((station) => station.id !== stationId));
-      toast.success(`${response.data.message}`);
+      if (response.data?.message) toast.success(response.data.message);
     } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        toast.error(error.response.data?.message ?? (error as Error).message);
+      } else {
+        toast.error((error as Error).message);
+      }
       console.error(error);
     }
   };
@@ -180,7 +215,13 @@ const Stations = () => {
     try {
       const response = await api.post(`counter/add/${stationId}`, newCounter);
       setCounters((prev) => [...prev, response.data.counter]);
+      if (response.data?.message) toast.success(response.data.message);
     } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        toast.error(error.response.data?.message ?? (error as Error).message);
+      } else {
+        toast.error((error as Error).message);
+      }
       console.error(error);
     }
   };
@@ -203,7 +244,13 @@ const Stations = () => {
           prev.id === counterId ? { ...prev, ...response.data.counter } : prev
         )
       );
+      if (response.data?.message) toast.success(response.data.message);
     } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        toast.error(error.response.data?.message ?? (error as Error).message);
+      } else {
+        toast.error((error as Error).message);
+      }
       console.error(error);
     }
   };
@@ -213,6 +260,11 @@ const Stations = () => {
       await api.delete(`/counter/delete/${stationId}/${counterId}`);
       setCounters((prev) => prev.filter((c) => c.id !== counterId));
     } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        toast.error(error.response.data?.message ?? (error as Error).message);
+      } else {
+        toast.error((error as Error).message);
+      }
       console.error(error);
     }
   };

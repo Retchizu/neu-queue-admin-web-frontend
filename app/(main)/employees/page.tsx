@@ -13,6 +13,8 @@ import React, { useEffect, useState } from "react";
 import EmployeesClient from "./_components/employees-client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import api from "@/lib/api";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 const EmployeesPage = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -21,7 +23,15 @@ const EmployeesPage = () => {
       try {
         const response = await api.get("/admin/employees");
         setEmployees(response.data.employees);
+        if (response.data?.message) {
+          toast.success(response.data.message);
+        }
       } catch (error) {
+        if (isAxiosError(error) && error.response) {
+          toast.error(error.response.data?.message ?? (error as Error).message);
+        } else {
+          toast.error((error as Error).message);
+        }
         console.error(error);
       }
     };

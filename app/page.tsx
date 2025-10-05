@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import api from "@/lib/api";
 import { isAxiosError } from "axios";
+import { toast } from "sonner";
 import { FirebaseError } from "firebase/app";
 import Image from "next/image";
 import neuLogo from "@/public/neu-logo.png";
@@ -30,7 +31,7 @@ export default function Home() {
       }
     });
 
-    return () => unsubscribe(); 
+    return () => unsubscribe();
   }, [router]);
 
   const handleLogin = async () => {
@@ -50,11 +51,15 @@ export default function Home() {
           await auth.signOut();
           localStorage.removeItem("token");
         }
-        alert(`${error.response.status}, ${error.response.data.message}`);
+        toast.error(
+          `${error.response.status}, ${error.response.data?.message}`
+        );
       } else if ((error as FirebaseError).code === "auth/user-disabled") {
-        alert("Your account is disabled. Contact the admin for more info.");
+        toast.error(
+          "Your account is disabled. Contact the admin for more info."
+        );
       } else {
-        alert((error as Error).message);
+        toast.error((error as Error).message);
       }
     }
   };

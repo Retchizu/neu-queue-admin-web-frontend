@@ -7,13 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// import { useVerifyUser } from "@/hooks/useVerifyUser";
+import { useVerifyUser } from "@/hooks/useVerifyUser";
 import React from "react";
 import AddStationDialog from "./_components/add-station-dialog";
 import StationList from "./_components/station-list";
 import CounterList from "./_components/counter-list";
 import type Station from "@/types/station";
-// CashierType moved to string union — use direct strings in mock data
 import type Counter from "@/types/counter";
 
 const initialStations: Station[] = [
@@ -58,6 +57,7 @@ const mockEmployees: Cashier[] = [
 ];
 
 const Stations = () => {
+  // useVerifyUser();
   const [stations, setStations] = React.useState<Station[]>(initialStations);
   const [counters, setCounters] = React.useState<Counter[]>(initialCounters);
   const [employees] = React.useState(mockEmployees);

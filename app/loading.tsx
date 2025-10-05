@@ -24,7 +24,7 @@ const Loading = () => {
           </h1>
 
           <p className="text-gray-600 dark:text-gray-400 max-w-md mb-8">
-            Please wait while we direct you to the next page.
+            Please wait while we direct you to your destination.
           </p>
 
           <div className="flex justify-center mb-8">

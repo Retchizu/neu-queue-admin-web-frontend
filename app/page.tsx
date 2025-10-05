@@ -36,16 +36,19 @@ export default function Home() {
   const handleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-
+      const credentials = await signInWithPopup(auth, provider);
+      const user = credentials.user;
+      const token = await user.getIdToken();
       const verifyResponse = await api.get("/user/verify");
       console.log(verifyResponse.data.user);
 
+      localStorage.setItem("token", token);
       router.replace("/employees");
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         if (error.response.status === 403) {
           await auth.signOut();
+          localStorage.removeItem("token");
         }
         alert(`${error.response.status}, ${error.response.data.message}`);
       } else if ((error as FirebaseError).code === "auth/user-disabled") {

@@ -172,13 +172,16 @@ const Stations = () => {
     }
   };
 
-  const addCounter = async (stationId: string, newCounter: Partial<Counter>) => {
-    console.log("test")
+  const addCounter = async (
+    stationId: string,
+    newCounter: Partial<Counter>
+  ) => {
+    console.log("test");
     try {
       const response = await api.post(`counter/add/${stationId}`, newCounter);
-      setCounters(prev => [...prev, response.data.counter])
+      setCounters((prev) => [...prev, response.data.counter]);
     } catch (error) {
-      console.error(error); 
+      console.error(error);
     }
   };
 
@@ -188,10 +191,12 @@ const Stations = () => {
     updatedCounter: Partial<Counter>
   ) => {
     try {
-      console.log("test",stationId, counterId)
       const response = await api.put(
         `counter/update/${stationId}/${counterId}`,
-        updatedCounter
+        {
+          counterNumber: updatedCounter.counterNumber,
+          employeeUID: updatedCounter.uid,
+        }
       );
       setCounters((prevCounters) =>
         prevCounters.map((prev) =>
@@ -205,13 +210,13 @@ const Stations = () => {
 
   const deleteCounter = async (stationId: string, counterId: string) => {
     try {
-      await api.delete(`/counter/delete/${stationId}/${counterId}`)
-      setCounters(prev => prev.filter(c => c.id !== counterId));
+      await api.delete(`/counter/delete/${stationId}/${counterId}`);
+      setCounters((prev) => prev.filter((c) => c.id !== counterId));
     } catch (error) {
       console.error(error);
-      
     }
-  }
+  };
+
   return (
     <Card className="h-full w-full flex flex-col">
       <CardHeader>
@@ -240,7 +245,6 @@ const Stations = () => {
           availableEmployees={availableEmployees}
           onAddCounter={addCounter}
           onDeleteCounter={deleteCounter}
-          onAssignEmployee={() => {}}
           onUpdateCounter={updateCounter}
         />
       </CardContent>

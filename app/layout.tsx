@@ -37,7 +37,9 @@ export default function RootLayout({
             defaultTheme="light"
             disableTransitionOnChange
           >
-            <div className="p-2">{children}</div>
+            <main className="w-full h-svh overflow-hidden flex flex-col">
+              <div className="flex-1 min-h-0 py-2">{children}</div>
+            </main>
           </ThemeProvider>
         </SidebarProvider>
       </body>

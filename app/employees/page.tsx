@@ -1,11 +1,12 @@
-import React from 'react'
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const page = () => {
   return (
-    <div>
-      manage-employees
-    </div>
-  )
-}
+    <Card className="h-full w-full py-0">
+      <CardContent className="px-0">manage employees</CardContent>
+    </Card>
+  );
+};
 
-export default page
+export default page;

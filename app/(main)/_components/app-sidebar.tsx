@@ -33,6 +33,11 @@ export function AppSidebar() {
                 <p className="font-medium">Pending Accounts</p>
               </SidebarMenuButton>
             </Link>
+            <Link href={"/blacklist"}>
+              <SidebarMenuButton>
+                <p className="font-medium">Blacklisted</p>
+              </SidebarMenuButton>
+            </Link>
             <Link href={"/logs"}>
               <SidebarMenuButton>
                 <p className="font-medium">Activity Logs</p>

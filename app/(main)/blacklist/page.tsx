@@ -1,3 +1,5 @@
+"use client";
+
 import { useVerifyUser } from "@/hooks/useVerifyUser";
 import React from "react";
 

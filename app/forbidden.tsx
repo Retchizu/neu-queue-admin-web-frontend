@@ -9,8 +9,6 @@ import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
-
-
 const ForbiddenPage = () => {
   return (
     <html lang="en" className={inter.className}>

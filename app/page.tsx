@@ -18,8 +18,8 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const router = useRouter();
   const [isFetchingUser, setIsFetchingUser] = useState(true);
-  
-  console.log(isFetchingUser)
+
+  console.log(isFetchingUser);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -69,12 +69,12 @@ export default function Home() {
         <Button
           onClick={async () => await handleLogin()}
           variant="outline"
-          className="w-full max-w-xs flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 mt-10"
+          className="w-full max-w-xs flex items-center justify-center gap-2 border border-gray-300 bg-white hover:bg-gray-100 mt-10"
         >
-          <FaGoogle color="red" />
           <span className="text-sm font-medium text-gray-700">
             Continue with Google
           </span>
+          <FaGoogle />
         </Button>
       )}
     </div>

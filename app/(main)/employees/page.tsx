@@ -1,7 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Employee } from "@/types/employee";
 import React, { useState } from "react";
@@ -51,7 +56,7 @@ const EmployeesPage = () => {
       const name = `${fn} ${ln}`;
       const id = `e_${String(i + 1).padStart(3, "0")}`;
       const role = roles[i % roles.length];
-      const createdAt = new Date(now - i * 1000 * 60 * 60 * 24).toISOString(); // 1 day apart
+      const createdAt = new Date(now - i * 1000 * 60 * 60 * 24).toISOString();
       const email = `${fn.toLowerCase()}.${ln.toLowerCase()}@neu.edu.ph`;
 
       return {
@@ -67,7 +72,13 @@ const EmployeesPage = () => {
   const [search, setSearch] = useState("");
 
   return (
-    <Card className="h-full w-full m-2">
+    <Card className="h-full w-full">
+      <CardHeader>
+        <CardTitle>Employee Management</CardTitle>
+        <CardDescription>
+          Assign roles to each users for the system.
+        </CardDescription>
+      </CardHeader>
       <CardContent className="flex flex-col h-full min-h-0">
         <div className="flex items-center gap-2 mb-4">
           <Input
@@ -77,7 +88,6 @@ const EmployeesPage = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Button className="ml-auto">Add employee</Button>
         </div>
         <ScrollArea className="flex-1 min-h-0">
           <EmployeesClient employees={employees} search={search} />

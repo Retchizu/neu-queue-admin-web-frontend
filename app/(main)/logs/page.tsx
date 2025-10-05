@@ -11,11 +11,9 @@ import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import LogsClient from "./_components/logs-client";
 import { ActivityLog, ActionType } from "@/types/log";
-import { useVerifyUser } from "@/hooks/useVerifyUser";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Activity = () => {
-  useVerifyUser();
   const [search, setSearch] = useState("");
 
   const logs: ActivityLog[] = React.useMemo(() => {

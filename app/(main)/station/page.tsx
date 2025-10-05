@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useVerifyUser } from "@/hooks/useVerifyUser";
 import React from "react";
 import { toast } from "sonner";
 import StationList from "./_components/station-list";
@@ -57,7 +56,6 @@ const mockEmployees: Cashier[] = [
 ];
 
 const Stations = () => {
-  useVerifyUser();
   const [stations, setStations] = React.useState<Station[]>(initialStations);
   const [counters, setCounters] = React.useState<Counter[]>(initialCounters);
   const [employees] = React.useState(mockEmployees);

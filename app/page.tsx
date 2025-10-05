@@ -83,8 +83,8 @@ export default function Home() {
           variant={"default"}
           size={"lg"}
         >
-          Continue with Google
           <FaGoogle />
+          Signin with Google
         </Button>
       )}
 

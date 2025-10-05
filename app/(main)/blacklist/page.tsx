@@ -69,8 +69,8 @@ const Blacklist = () => {
       const email = `${fn.toLowerCase()}.${ln.toLowerCase()}@neu.edu.ph`;
 
       return {
-        id,
-        name,
+        uid: id,
+        displayName: name,
         email,
         role,
         createdAt,

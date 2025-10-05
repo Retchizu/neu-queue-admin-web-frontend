@@ -16,7 +16,6 @@ import { Employee } from "@/types/employee";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -168,7 +167,9 @@ export default function CounterList({
                             </Badge>
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            <span className="font-bold">Assigned Cashier: </span>
+                            <span className="font-bold">
+                              Assigned Cashier:{" "}
+                            </span>
                             {assignedEmployee
                               ? assignedEmployee.displayName
                               : "No cashier"}

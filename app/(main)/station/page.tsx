@@ -273,7 +273,7 @@ const Stations = () => {
   };
 
   return (
-    <Card className="h-full w-full flex flex-col">
+    <Card className="h-full w-full flex flex-col border border-[var(--primary)]">
       <CardHeader>
         <CardTitle>Stations and Counters</CardTitle>
         <CardDescription>

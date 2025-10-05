@@ -83,7 +83,7 @@ const Activity = () => {
   }, []);
 
   return (
-    <Card className="h-full w-full">
+    <Card className="h-full w-full border border-[var(--primary)]">
       <CardHeader>
         <CardTitle>Activity Logs</CardTitle>
         <CardDescription>

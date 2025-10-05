@@ -11,6 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuAction,
 } from "@/components/ui/sidebar";
 import { auth } from "@/lib/firebaseConfig";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -33,7 +34,7 @@ export function AppSidebar() {
   const { setTheme } = useTheme();
   const user = auth.currentUser;
   return (
-    <Sidebar variant="floating">
+    <Sidebar variant="floating" className="">
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <Image src={neuLogo} alt="neu-logo" className="h-8 w-8 select-none" />
@@ -46,11 +47,13 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <Link href={"/employees"}>
+                <SidebarMenuAction className="peer-data-[active=true]/menu-button:opacity-100" />
                 <SidebarMenuButton>
                   <p className="font-medium">Employees</p>
                 </SidebarMenuButton>
               </Link>
               <Link href={"/station"}>
+                <SidebarMenuAction className="peer-data-[active=true]/menu-button:opacity-100" />
                 <SidebarMenuButton>
                   <p className="font-medium">Stations</p>
                 </SidebarMenuButton>
@@ -63,11 +66,13 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <Link href={"/pending"}>
+                <SidebarMenuAction className="peer-data-[active=true]/menu-button:opacity-100" />
                 <SidebarMenuButton>
                   <p className="font-medium">Pending Accounts</p>
                 </SidebarMenuButton>
               </Link>
               <Link href={"/blacklist"}>
+                <SidebarMenuAction className="peer-data-[active=true]/menu-button:opacity-100" />
                 <SidebarMenuButton>
                   <p className="font-medium">Blacklisted</p>
                 </SidebarMenuButton>
@@ -80,11 +85,14 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <Link href={"/logs"}>
+                <SidebarMenuAction className="peer-data-[active=true]/menu-button:opacity-100" />
+
                 <SidebarMenuButton>
                   <p className="font-medium">Activity Logs</p>
                 </SidebarMenuButton>
               </Link>
               <Link href={"/analytics"}>
+                <SidebarMenuAction className="peer-data-[active=true]/menu-button:opacity-100" />
                 <SidebarMenuButton>
                   <p className="font-medium">Analytics</p>
                 </SidebarMenuButton>
@@ -179,7 +187,7 @@ export function AppSidebar() {
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
-          </SidebarMenu>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

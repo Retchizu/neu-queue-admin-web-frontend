@@ -117,7 +117,7 @@ const Blacklist = () => {
   }
 
   return (
-    <Card className="h-full w-full">
+    <Card className="h-full w-full border border-[var(--primary)]">
       <CardHeader>
         <CardTitle>Blacklisted Users</CardTitle>
         <CardDescription>

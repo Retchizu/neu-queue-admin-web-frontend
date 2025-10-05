@@ -41,7 +41,7 @@ const chartConfig = {
 
 const AnalyticsChart = () => {
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col border border-[var(--primary)]">
       <CardHeader>
         <CardTitle>Analytics Report</CardTitle>
         <CardDescription>

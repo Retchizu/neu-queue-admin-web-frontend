@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+// ...existing imports
 import {
   Card,
   CardContent,
@@ -12,9 +12,12 @@ import React, { useState } from "react";
 import LogsClient from "./_components/logs-client";
 import { ActivityLog, ActionType } from "@/types/log";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { DatePicker } from "./_components/date-picker";
 
 const Activity = () => {
   const [search, setSearch] = useState("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   const logs: ActivityLog[] = React.useMemo(() => {
     const actions = [
@@ -96,11 +99,44 @@ const Activity = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Button className="ml-auto">Export</Button>
+          <DatePicker
+            value={startDate ?? undefined}
+            onChange={(d) => {
+              setStartDate(d ?? null);
+              // reset end date if it's before new start
+              if (d && endDate && endDate < d) setEndDate(null);
+            }}
+            label="Start date"
+          />
+          <DatePicker
+            value={endDate ?? undefined}
+            onChange={(d) => setEndDate(d ?? null)}
+            disabled={!startDate}
+            label="End date"
+          />
         </div>
 
         <ScrollArea className="flex-1 min-h-0">
-          <LogsClient logs={logs} search={search} />
+          <LogsClient
+            logs={React.useMemo(() => {
+              // when both dates set -> filter between start (00:00) and end (23:59:59.999)
+              if (startDate && endDate) {
+                const start = new Date(startDate);
+                start.setHours(0, 0, 0, 0);
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+                return logs.filter(
+                  (l) =>
+                    l.timestamp >= start.getTime() &&
+                    l.timestamp <= end.getTime()
+                );
+              }
+
+              // otherwise sort by most recent first
+              return [...logs].sort((a, b) => b.timestamp - a.timestamp);
+            }, [logs, startDate, endDate])}
+            search={search}
+          />
         </ScrollArea>
       </CardContent>
     </Card>

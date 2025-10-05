@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useVerifyUser } from "@/hooks/useVerifyUser";
 
 const Blacklist = () => {
   useVerifyUser();

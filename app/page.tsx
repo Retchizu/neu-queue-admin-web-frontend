@@ -30,7 +30,7 @@ export default function Home() {
       }
     });
 
-    return () => unsubscribe(); 
+    return () => unsubscribe();
   }, [router]);
 
   const handleLogin = async () => {

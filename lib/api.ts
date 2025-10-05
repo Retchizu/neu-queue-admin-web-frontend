@@ -14,7 +14,7 @@ api.interceptors.request.use(async (config) => {
 
   if (user) {
     const token = await user.getIdToken();
-
+    console.info(token);
     config.headers = AxiosHeaders.from({
       ...(config.headers || {}),
       Authorization: `Bearer ${token}`,

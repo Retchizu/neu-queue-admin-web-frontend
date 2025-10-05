@@ -30,7 +30,7 @@ export default function Home() {
       }
     });
 
-    return () => unsubscribe(); // cleanup listener on unmount
+    return () => unsubscribe(); 
   }, [router]);
 
   const handleLogin = async () => {
@@ -56,27 +56,38 @@ export default function Home() {
     }
   };
   return (
-    <div className="flex items-center justify-center min-h-screen flex-col">
-      <Image src={neuLogo} alt="neu-logo" className="h-50 w-50 mb-10" />
-      <h1 className="text-4xl font-semibold text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center">
+      <Image
+        src={neuLogo}
+        alt="neu-logo"
+        className="h-40 w-40 mb-8 select-none"
+        priority
+      />
+
+      <h1 className="text-5xl font-bold mb-4 text-gray-900 dark:text-gray-100">
         Welcome to NEUQueue
       </h1>
-      <p className="text-center">
-        NEUQUEUE brings smart queuing to New Era University Say goodbye to long
-        lines.{" "}
+
+      <p className="text-gray-600 dark:text-gray-400 max-w-md mb-8">
+        NEUQUEUE brings smart queuing to New Era University. Say goodbye to long
+        lines and improve how your campus manages queues.
       </p>
+
       {!isFetchingUser && (
         <Button
+          className="px-6 py-2 rounded-xl bg-primary text-white hover:opacity-90"
           onClick={async () => await handleLogin()}
-          variant="outline"
-          className="w-full max-w-xs flex items-center justify-center gap-2 border border-gray-300 bg-white hover:bg-gray-100 mt-10"
+          variant={"default"}
+          size={"lg"}
         >
-          <span className="text-sm font-medium text-gray-700">
-            Continue with Google
-          </span>
+          Continue with Google
           <FaGoogle />
         </Button>
       )}
+
+      <p className="text-xs text-gray-400 mt-10">
+        © {new Date().getFullYear()} NEUQueue
+      </p>
     </div>
   );
 }

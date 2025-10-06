@@ -70,7 +70,7 @@ const Pending = () => {
   const [search, setSearch] = React.useState("");
 
   return (
-    <Card className="h-full w-full">
+    <Card className="h-full w-full border border-[var(--primary)]">
       <CardHeader>
         <CardTitle>Pending User Management</CardTitle>
         <CardDescription>Manage users and assign roles.</CardDescription>

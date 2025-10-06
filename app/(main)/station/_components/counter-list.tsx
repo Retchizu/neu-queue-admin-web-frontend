@@ -11,9 +11,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import type Counter from "@/types/counter";
 import AddCounterDialog from "./add-counter-dialog";
-import AssignCashierDialog from "./assign-cashier-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Employee } from "@/types/employee";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import EditCounterDialog from "./update-counter-dialog";
 import DeleteCounterDialog from "./delete-counter-dialog";
 
@@ -51,7 +57,7 @@ export default function CounterList({
         <CardTitle>Counters</CardTitle>
         <CardDescription className="flex items-center justify-between">
           Total count: {counters.length}
-          {onAddCounter && (
+          {onAddCounter && selectedStationIndex !== null && (
             <AddCounterDialog
               stationId={stationId}
               employees={employees}
@@ -78,59 +84,109 @@ export default function CounterList({
                 (emp) => emp.uid === counter.uid
               );
 
+              function CounterCard({
+                counter,
+                assignedEmployee,
+              }: {
+                counter: Counter;
+                assignedEmployee: Employee | undefined | null;
+              }) {
+                return (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Card className="cursor-pointer hover:bg-muted/50 transition-colors mb-2">
+                        <CardContent className="flex flex-col justify-between h-20">
+                          <div className="flex items-center justify-between">
+                            <div className="font-medium text-lg">
+                              Counter {counter.counterNumber}
+                            </div>
+
+                            {/* 🧩 Edit + Delete row */}
+                            <div
+                              className="flex items-center gap-2"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {onUpdateCounter && (
+                                <EditCounterDialog
+                                  availableEmployees={availableEmployees}
+                                  counter={counter}
+                                  stationId={stationId}
+                                  onUpdateCounter={onUpdateCounter}
+                                />
+                              )}
+                              {onDeleteCounter && (
+                                <DeleteCounterDialog
+                                  stationId={stationId}
+                                  counterId={counter.id}
+                                  counterNumber={counter.counterNumber}
+                                  onDeleteCounter={onDeleteCounter}
+                                />
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-sm text-muted-foreground">
+                            <div className="truncate">
+                              {counter.serving
+                                ? `Serving: ${counter.serving}`
+                                : "Not serving"}
+                            </div>
+                            <Badge
+                              variant={
+                                counter.serving ? "default" : "secondary"
+                              }
+                            >
+                              {assignedEmployee
+                                ? assignedEmployee.displayName
+                                : "No cashier"}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </DialogTrigger>
+
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>
+                          Counter {counter.counterNumber}
+                        </DialogTitle>
+                      </DialogHeader>
+
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-bold">Status</span>:{" "}
+                            <Badge
+                              variant={
+                                counter.serving ? "default" : "secondary"
+                              }
+                            >
+                              {counter.serving
+                                ? counter.serving
+                                : "Not serving"}
+                            </Badge>
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-bold">
+                              Assigned Cashier:{" "}
+                            </span>
+                            {assignedEmployee
+                              ? assignedEmployee.displayName
+                              : "No cashier"}
+                          </p>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                );
+              }
+
               return (
-                <AssignCashierDialog
+                <CounterCard
                   key={counter.id}
                   counter={counter}
-                  employees={employees}
-                  availableEmployees={availableEmployees}
-                >
-                  <Card className="cursor-pointer hover:bg-muted/50 transition-colors mb-2">
-                    <CardContent className="flex flex-col justify-between h-20">
-                      <div className="flex items-center justify-between">
-                        <div className="font-medium text-lg">
-                          Counter {counter.counterNumber}
-                        </div>
-
-                        {/* 🧩 Edit + Delete row */}
-                        <div
-                          className="flex items-center gap-2"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {onUpdateCounter && (
-                            <EditCounterDialog
-                              availableEmployees={availableEmployees}
-                              counter={counter}
-                              stationId={stationId}
-                              onUpdateCounter={onUpdateCounter}
-                            />
-                          )}
-                          {onDeleteCounter && (
-                            <DeleteCounterDialog
-                              stationId={stationId}
-                              counterId={counter.id}
-                              counterNumber={counter.counterNumber}
-                              onDeleteCounter={onDeleteCounter}
-                            />
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <div className="truncate">
-                          {counter.serving
-                            ? `Serving: ${counter.serving}`
-                            : "Not serving"}
-                        </div>
-                        <Badge variant="secondary">
-                          {assignedEmployee
-                            ? assignedEmployee.displayName
-                            : "No cashier"}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </AssignCashierDialog>
+                  assignedEmployee={assignedEmployee}
+                />
               );
             })
           )}

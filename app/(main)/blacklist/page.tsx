@@ -69,8 +69,8 @@ const Blacklist = () => {
       const email = `${fn.toLowerCase()}.${ln.toLowerCase()}@neu.edu.ph`;
 
       return {
-        id,
-        name,
+        uid: id,
+        displayName: name,
         email,
         role,
         createdAt,
@@ -117,7 +117,7 @@ const Blacklist = () => {
   }
 
   return (
-    <Card className="h-full w-full">
+    <Card className="h-full w-full border border-[var(--primary)]">
       <CardHeader>
         <CardTitle>Blacklisted Users</CardTitle>
         <CardDescription>

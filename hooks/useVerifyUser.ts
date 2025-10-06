@@ -4,6 +4,7 @@ import api from "@/lib/api";
 import { auth } from "@/lib/firebaseConfig";
 import { onAuthStateChanged } from "@firebase/auth";
 import { isAxiosError } from "axios";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -17,6 +18,9 @@ export const useVerifyUser = () => {
       } catch (error) {
         if (isAxiosError(error)) {
           const status = error.response?.status;
+          const message =
+            error.response?.data?.message ?? (error as Error).message;
+          toast.error(message);
           switch (status) {
             case 401:
             case 403:

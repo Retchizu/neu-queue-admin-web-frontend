@@ -13,19 +13,64 @@ import React, { useEffect, useState } from "react";
 import EmployeesClient from "./_components/employees-client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import api from "@/lib/api";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 const EmployeesPage = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const fetchEmployees = async () => {
+    try {
+      const response = await api.get("/admin/employees");
+      // normalize incoming employee objects to the canonical Employee shape
+      const raw = (response.data.employees ?? []) as unknown[];
+      const employeesFromApi: Employee[] = raw.map((item) => {
+        const u = item as Record<string, unknown>;
+        const getStr = (k: string) =>
+          typeof u[k] === "string" ? (u[k] as string) : "";
+
+        const roleRaw = getStr("role");
+        const role =
+          roleRaw.length > 0
+            ? roleRaw.charAt(0).toUpperCase() + roleRaw.slice(1).toLowerCase()
+            : "";
+
+        return {
+          uid: getStr("uid") || getStr("id"),
+          displayName: getStr("displayName") || getStr("name"),
+          email: getStr("email"),
+          role,
+          createdAt: getStr("createdAt"),
+        } as Employee;
+      });
+      setEmployees(employeesFromApi);
+      if (response.data?.message) {
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        toast.error(error.response.data?.message ?? (error as Error).message);
+      } else {
+        toast.error((error as Error).message);
+      }
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const getEmployees = async () => {
+    fetchEmployees();
+
+    const getCurrentUser = async () => {
       try {
-        const response = await api.get("/admin/employees");
-        setEmployees(response.data.employees);
-      } catch (error) {
-        console.error(error);
+        const resp = await api.get("/user/verify");
+        const role = resp.data?.user?.role ?? null;
+        setCurrentUserRole(role);
+      } catch (err) {
+        // ignore - verification handled elsewhere; keep role null
+        console.error("Failed to fetch current user role", err);
       }
     };
-    getEmployees();
+    getCurrentUser();
   }, []);
   console.log(employees);
 
@@ -85,7 +130,7 @@ const EmployeesPage = () => {
   const [search, setSearch] = useState("");
 
   return (
-    <Card className="h-full w-full">
+    <Card className="h-full w-full border border-[var(--primary)]">
       <CardHeader>
         <CardTitle>Employee Management</CardTitle>
         <CardDescription>
@@ -103,7 +148,12 @@ const EmployeesPage = () => {
           />
         </div>
         <ScrollArea className="flex-1 min-h-0">
-          <EmployeesClient employees={employees} search={search} />
+          <EmployeesClient
+            employees={employees}
+            search={search}
+            currentUserRole={currentUserRole}
+            onRoleChanged={fetchEmployees}
+          />
         </ScrollArea>
       </CardContent>
     </Card>

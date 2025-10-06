@@ -22,7 +22,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
+// ...existing code...
 
 interface Props {
   employees: Employee[];
@@ -100,7 +100,6 @@ export default function PendingClient({ employees, search, onAccept }: Props) {
   function handleAccept() {
     if (!selected) return;
     if (onAccept) onAccept(selected.uid, selectedRole);
-    toast.success(`${selected.email} accepted as ${selectedRole}`);
     setOpen(false);
   }
 

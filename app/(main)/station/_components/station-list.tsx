@@ -51,7 +51,7 @@ const StationList = ({
               <Card
                 key={s.id}
                 className={`cursor-pointer hover:bg-muted/50 transition-colors mb-2 ${
-                  selectedId === s.id ? "bg-muted/80" : ""
+                  selectedId === s.id ? "bg-primary/10" : ""
                 }`}
                 onClick={() => onSelect(stationId)}
               >
@@ -70,7 +70,7 @@ const StationList = ({
                         onSave={onUpdateStation}
                       />
                     )}
-                     {selectedId === s.id && onDeleteStation && (
+                    {selectedId === s.id && onDeleteStation && (
                       <DeleteStationDialog
                         stationName={s.name}
                         onConfirm={() => onDeleteStation(stationId)}

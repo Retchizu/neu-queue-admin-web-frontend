@@ -20,15 +20,23 @@ import { Employee } from "@/types/employee";
 interface Props {
   employees: Employee[];
   search?: string;
+  currentUserRole?: string | null;
+  onRoleChanged?: () => Promise<void>;
 }
 
-export default function EmployeesClient({ employees, search }: Props) {
+export default function EmployeesClient({
+  employees,
+  search,
+  currentUserRole,
+  onRoleChanged,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Employee | null>(null);
   const [selectedRole, setSelectedRole] = useState<Employee["role"]>("Cashier");
+
   const columns: ColumnDef<Employee>[] = [
     {
-      accessorKey: "name",
+      accessorKey: "displayName",
       header: "Name",
       cell: ({ getValue }) => (
         <div className="font-medium">{getValue<string>()}</div>
@@ -58,7 +66,18 @@ export default function EmployeesClient({ employees, search }: Props) {
       id: "actions",
       cell: ({ row }) => {
         const employee = row.original;
-        const roles = ["Admin", "Cashier", "Information"];
+
+        const requester = (currentUserRole || "").toString().toLowerCase();
+
+        const allowedRoles: string[] =
+          requester === "superadmin"
+            ? ["Admin", "Cashier", "Information"]
+            : requester === "admin"
+            ? ["Cashier", "Information"]
+            : [];
+
+        // if the current user cannot change roles, render nothing in actions
+        if (allowedRoles.length === 0) return null;
 
         return (
           <>
@@ -69,9 +88,10 @@ export default function EmployeesClient({ employees, search }: Props) {
                   <MoreHorizontal />
                 </Button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                {roles.map((r) =>
+                {allowedRoles.map((r) =>
                   r === employee.role ? null : (
                     <DropdownMenuItem
                       key={r}
@@ -93,12 +113,32 @@ export default function EmployeesClient({ employees, search }: Props) {
               onOpenChange={setOpen}
               selected={selected}
               selectedRole={selectedRole}
-              onConfirm={() => {
+              onConfirm={async () => {
                 if (!selected) return;
-                // call api for change role here
-                toast.success(
-                  `${selected.email} role changed to ${selectedRole}`
-                );
+                try {
+                  await (
+                    await import("@/lib/api")
+                  ).default.post("/admin/set-role", {
+                    uid: selected.uid,
+                    role: String(selectedRole).toLowerCase(),
+                  });
+                  toast.success(
+                    `${selected.email} role changed to ${selectedRole}`
+                  );
+                  await onRoleChanged?.();
+                } catch (err: unknown) {
+                  const e = err as
+                    | {
+                        response?: { data?: { message?: string } };
+                        message?: string;
+                      }
+                    | undefined;
+                  const msg =
+                    e?.response?.data?.message ||
+                    e?.message ||
+                    "Failed to change role";
+                  toast.error(msg);
+                }
               }}
               onCancel={() => setSelected(null)}
             />
@@ -112,7 +152,9 @@ export default function EmployeesClient({ employees, search }: Props) {
   const filtered = useMemo(() => {
     if (!q) return employees;
     return employees.filter((e) =>
-      [e.name, e.email, e.role].some((field) => field.toLowerCase().includes(q))
+      [e.displayName, e.email, e.role].some((field) =>
+        field.toLowerCase().includes(q)
+      )
     );
   }, [employees, q]);
 

@@ -18,24 +18,38 @@ import { isAxiosError } from "axios";
 
 const EmployeesPage = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const fetchEmployees = async () => {
+    try {
+      const response = await api.get("/admin/employees");
+      setEmployees(response.data.employees);
+      if (response.data?.message) {
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        toast.error(error.response.data?.message ?? (error as Error).message);
+      } else {
+        toast.error((error as Error).message);
+      }
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const getEmployees = async () => {
+    fetchEmployees();
+
+    const getCurrentUser = async () => {
       try {
-        const response = await api.get("/admin/employees");
-        setEmployees(response.data.employees);
-        if (response.data?.message) {
-          toast.success(response.data.message);
-        }
-      } catch (error) {
-        if (isAxiosError(error) && error.response) {
-          toast.error(error.response.data?.message ?? (error as Error).message);
-        } else {
-          toast.error((error as Error).message);
-        }
-        console.error(error);
+        const resp = await api.get("/user/verify");
+        const role = resp.data?.user?.role ?? null;
+        setCurrentUserRole(role);
+      } catch (err) {
+        // ignore - verification handled elsewhere; keep role null
+        console.error("Failed to fetch current user role", err);
       }
     };
-    getEmployees();
+    getCurrentUser();
   }, []);
   console.log(employees);
 
@@ -113,7 +127,12 @@ const EmployeesPage = () => {
           />
         </div>
         <ScrollArea className="flex-1 min-h-0">
-          <EmployeesClient employees={employees} search={search} />
+          <EmployeesClient
+            employees={employees}
+            search={search}
+            currentUserRole={currentUserRole}
+            onRoleChanged={fetchEmployees}
+          />
         </ScrollArea>
       </CardContent>
     </Card>

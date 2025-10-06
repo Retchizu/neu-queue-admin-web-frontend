@@ -293,6 +293,7 @@ const Blacklist = () => {
             search={search}
             list={blacklist}
             onRemove={handleRemove}
+            loading={loading}
           />
         </ScrollArea>
       </CardContent>

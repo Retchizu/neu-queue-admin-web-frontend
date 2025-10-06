@@ -30,6 +30,7 @@ interface Props {
   search?: string;
   list?: BlacklistType[];
   onRemove?: (email: string) => Promise<void> | void;
+  loading?: boolean;
 }
 
 export default function BlacklistClient({
@@ -37,6 +38,7 @@ export default function BlacklistClient({
   search,
   list: propList,
   onRemove,
+  loading,
 }: Props) {
   const [internalList, setInternalList] = React.useState<BlacklistType[]>([]);
   const list = propList ?? internalList;
@@ -157,7 +159,7 @@ export default function BlacklistClient({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <DataTable columns={columns} data={filtered} />
+      <DataTable columns={columns} data={filtered} isLoading={loading} />
     </div>
   );
 }

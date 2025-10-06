@@ -273,7 +273,7 @@ const Stations = () => {
   };
 
   return (
-    <Card className="h-full w-full flex flex-col border border-[var(--primary)]">
+    <Card className="h-full w-full flex flex-col border border-[var(--primary)] rounded-xl">
       <CardHeader>
         <CardTitle>Stations and Counters</CardTitle>
         <CardDescription>
@@ -283,25 +283,31 @@ const Stations = () => {
       </CardHeader>
 
       <CardContent className="flex gap-2 flex-1 min-h-0">
-        <StationList
-          stations={stations}
-          selectedId={selectedStationId}
-          onSelect={setSelectedStationId}
-          onAddStation={addStation}
-          onDeleteStation={deleteStation}
-          onUpdateStation={updateStation}
-        />
+        {/* Station panel: shows a primary border on hover */}
+        <div className="flex-1 min-h-0 border border-transparent hover:border-[var(--primary)] transition-colors duration-150 rounded-xl">
+          <StationList
+            stations={stations}
+            selectedId={selectedStationId}
+            onSelect={setSelectedStationId}
+            onAddStation={addStation}
+            onDeleteStation={deleteStation}
+            onUpdateStation={updateStation}
+          />
+        </div>
 
-        <CounterList
-          stationId={selectedStationId!}
-          counters={counters}
-          selectedStationIndex={selectedStationId}
-          employees={employees}
-          availableEmployees={availableEmployees}
-          onAddCounter={addCounter}
-          onDeleteCounter={deleteCounter}
-          onUpdateCounter={updateCounter}
-        />
+        {/* Counter panel: shows a primary border on hover */}
+        <div className="flex-1 min-h-0 border border-transparent hover:border-[var(--primary)] transition-colors duration-150 rounded-xl">
+          <CounterList
+            stationId={selectedStationId!}
+            counters={counters}
+            selectedStationIndex={selectedStationId}
+            employees={employees}
+            availableEmployees={availableEmployees}
+            onAddCounter={addCounter}
+            onDeleteCounter={deleteCounter}
+            onUpdateCounter={updateCounter}
+          />
+        </div>
       </CardContent>
     </Card>
   );

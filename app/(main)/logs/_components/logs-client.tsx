@@ -15,7 +15,7 @@ export default function LogsClient({ logs, search }: Props) {
   const columns: ColumnDef<ActivityLog>[] = [
     {
       accessorKey: "userId",
-      header: "User ID",
+      header: "",
       cell: ({ getValue }) => (
         <div className="font-medium">{getValue<string>()}</div>
       ),

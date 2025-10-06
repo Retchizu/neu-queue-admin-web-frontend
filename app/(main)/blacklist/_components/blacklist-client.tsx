@@ -28,8 +28,6 @@ import { toast } from "sonner";
 interface Props {
   employees: Employee[];
   search?: string;
-  // optional external list and handlers; if not provided the component
-  // will manage its own internal list (for backward-compatibility)
   list?: BlacklistType[];
   onRemove?: (email: string) => void;
 }
@@ -75,7 +73,6 @@ export default function BlacklistClient({
       accessorKey: "name",
       header: "Name",
       cell: ({ row }) => {
-        // For blacklist entries we may not have a name; try to find employee by email
         const email = row.getValue("email") as string;
         const found = employees.find((e) => e.email === email);
         return (

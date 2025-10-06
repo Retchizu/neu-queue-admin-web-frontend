@@ -8,79 +8,65 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LogsClient from "./_components/logs-client";
-import { ActivityLog, ActionType } from "@/types/log";
+import { ActivityLog } from "@/types/log";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DatePicker } from "./_components/date-picker";
+import api from "@/lib/api";
 
 const Activity = () => {
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
-  const logs: ActivityLog[] = React.useMemo(() => {
-    const actions = [
-      ActionType.LOG_IN,
-      ActionType.LOG_OUT,
-      ActionType.JOIN_QUEUE,
-      ActionType.LEAVE_QUEUE,
-      ActionType.SERVE_CUSTOMER,
-      ActionType.SKIP_CUSTOMER,
-      ActionType.COMPLETE_TRANSACTION,
-      ActionType.ASSIGN_ROLE,
-      ActionType.BLOCK_EMAIL,
-      ActionType.UNBLOCK_EMAIL,
-    ];
+  const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const [loading, setLoading] = useState(false);
 
-    const detailsByAction: Record<string, string[]> = {
-      [ActionType.LOG_IN]: [
-        "User logged in",
-        "Login via SSO",
-        "Password login",
-      ],
-      [ActionType.LOG_OUT]: ["User logged out"],
-      [ActionType.JOIN_QUEUE]: [
-        "Joined service A",
-        "Joined service B",
-        "Joined VIP queue",
-      ],
-      [ActionType.LEAVE_QUEUE]: ["Left queue before service"],
-      [ActionType.SERVE_CUSTOMER]: [
-        "Served ticket #42",
-        "Served ticket #7",
-        "Served VIP customer",
-      ],
-      [ActionType.SKIP_CUSTOMER]: ["Skipped ticket #13"],
-      [ActionType.COMPLETE_TRANSACTION]: [
-        "Completed payment",
-        "Completed refund",
-      ],
-      [ActionType.ASSIGN_ROLE]: [
-        "Assigned role: admin",
-        "Assigned role: attendant",
-      ],
-      [ActionType.BLOCK_EMAIL]: ["Blocked user@example.com"],
-      [ActionType.UNBLOCK_EMAIL]: ["Unblocked user@example.com"],
+  // initialize default date range: yesterday -> today
+  useEffect(() => {
+    if (!startDate && !endDate) {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+
+      // set times to just date objects (UI will handle range expansion on fetch)
+      setStartDate(yesterday);
+      setEndDate(today);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      if (!startDate || !endDate) return;
+      setLoading(true);
+      try {
+        const startIso = new Date(startDate).toISOString();
+        const endIso = new Date(endDate).toISOString();
+        const resp = await api.get("/admin/get-activity", {
+          params: { startDate: startIso, endDate: endIso },
+        });
+        const activities: ActivityLog[] = resp.data?.activities ?? [];
+        setLogs(
+          // ensure numbers for timestamp and fallback shapes
+          activities.map((a) => ({
+            ...a,
+            timestamp:
+              typeof a.timestamp === "number"
+                ? a.timestamp
+                : new Date(a.timestamp as string).getTime(),
+          }))
+        );
+      } catch (err) {
+        console.error("Failed to fetch activity logs:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const count = 50;
-    const now = Date.now();
-
-    return Array.from({ length: count }).map((_, i) => {
-      const action = actions[i % actions.length];
-      const detailsOptions = detailsByAction[action] ?? ["Action performed"];
-      const details = detailsOptions[i % detailsOptions.length];
-      return {
-        id: `l_${String(i + 1).padStart(3, "0")}`,
-        userId: `e_${String((i % 12) + 1).padStart(3, "0")}`,
-        action,
-        timestamp: now - i * 1000 * 60 * 2,
-        details,
-        metadata: { seq: i + 1 },
-      } as ActivityLog;
-    });
-  }, []);
+    fetchLogs();
+  }, [startDate, endDate]);
 
   return (
     <Card className="h-full w-full border border-[var(--primary)]">
@@ -117,6 +103,7 @@ const Activity = () => {
         </div>
 
         <ScrollArea className="flex-1 min-h-0">
+          {loading ? <div className="p-4">Loading...</div> : null}
           <LogsClient
             logs={React.useMemo(() => {
               // when both dates set -> filter between start (00:00) and end (23:59:59.999)

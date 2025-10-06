@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,13 +34,14 @@ export default function EmployeesClient({
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Employee | null>(null);
   const [selectedRole, setSelectedRole] = useState<Employee["role"]>("Cashier");
+  const [changingUid, setChangingUid] = useState<string | null>(null);
 
   const columns: ColumnDef<Employee>[] = [
     {
       accessorKey: "displayName",
       header: "Name",
-      cell: ({ getValue }) => (
-        <div className="font-medium">{getValue<string>()}</div>
+      cell: ({ row }) => (
+        <div className="font-medium">{row.original.displayName ?? "-"}</div>
       ),
     },
     {
@@ -76,37 +78,43 @@ export default function EmployeesClient({
             ? ["Cashier", "Information"]
             : [];
 
-        // if the current user cannot change roles, render nothing in actions
         if (allowedRoles.length === 0) return null;
 
         return (
           <>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal />
-                </Button>
-              </DropdownMenuTrigger>
+            {changingUid === employee.uid ? (
+              <Button variant="ghost" className="h-8 w-8 p-0" disabled>
+                <span className="sr-only">Updating</span>
+                <Spinner className="w-4 h-4" />
+              </Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal />
+                  </Button>
+                </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                {allowedRoles.map((r) =>
-                  r === employee.role ? null : (
-                    <DropdownMenuItem
-                      key={r}
-                      onClick={() => {
-                        setSelected(employee);
-                        setSelectedRole(r as Employee["role"]);
-                        setOpen(true);
-                      }}
-                    >
-                      Set role: {r}
-                    </DropdownMenuItem>
-                  )
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  {allowedRoles.map((r) =>
+                    r === employee.role ? null : (
+                      <DropdownMenuItem
+                        key={r}
+                        onClick={() => {
+                          setSelected(employee);
+                          setSelectedRole(r as Employee["role"]);
+                          setOpen(true);
+                        }}
+                      >
+                        Set role: {r}
+                      </DropdownMenuItem>
+                    )
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             <ChangeRoleDialog
               open={open}
@@ -115,6 +123,7 @@ export default function EmployeesClient({
               selectedRole={selectedRole}
               onConfirm={async () => {
                 if (!selected) return;
+                setChangingUid(selected.uid);
                 try {
                   await (
                     await import("@/lib/api")
@@ -138,6 +147,8 @@ export default function EmployeesClient({
                     e?.message ||
                     "Failed to change role";
                   toast.error(msg);
+                } finally {
+                  setChangingUid(null);
                 }
               }}
               onCancel={() => setSelected(null)}
@@ -152,8 +163,8 @@ export default function EmployeesClient({
   const filtered = useMemo(() => {
     if (!q) return employees;
     return employees.filter((e) =>
-      [e.displayName, e.email, e.role].some((field) =>
-        field.toLowerCase().includes(q)
+      [e.displayName ?? "", e.email ?? "", e.role ?? ""].some((field) =>
+        String(field).toLowerCase().includes(q)
       )
     );
   }, [employees, q]);

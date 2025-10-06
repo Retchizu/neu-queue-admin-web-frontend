@@ -78,7 +78,9 @@ export default function BlacklistClient({
         // For blacklist entries we may not have a name; try to find employee by email
         const email = row.getValue("email") as string;
         const found = employees.find((e) => e.email === email);
-        return <div className="font-medium">{found ? found.name : "-"}</div>;
+        return (
+          <div className="font-medium">{found ? found.displayName : "-"}</div>
+        );
       },
     },
     {

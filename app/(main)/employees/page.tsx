@@ -22,7 +22,28 @@ const EmployeesPage = () => {
   const fetchEmployees = async () => {
     try {
       const response = await api.get("/admin/employees");
-      setEmployees(response.data.employees);
+      // normalize incoming employee objects to the canonical Employee shape
+      const raw = (response.data.employees ?? []) as unknown[];
+      const employeesFromApi: Employee[] = raw.map((item) => {
+        const u = item as Record<string, unknown>;
+        const getStr = (k: string) =>
+          typeof u[k] === "string" ? (u[k] as string) : "";
+
+        const roleRaw = getStr("role");
+        const role =
+          roleRaw.length > 0
+            ? roleRaw.charAt(0).toUpperCase() + roleRaw.slice(1).toLowerCase()
+            : "";
+
+        return {
+          uid: getStr("uid") || getStr("id"),
+          displayName: getStr("displayName") || getStr("name"),
+          email: getStr("email"),
+          role,
+          createdAt: getStr("createdAt"),
+        } as Employee;
+      });
+      setEmployees(employeesFromApi);
       if (response.data?.message) {
         toast.success(response.data.message);
       }

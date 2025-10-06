@@ -39,7 +39,7 @@ export default function PendingClient({ employees, search, onAccept }: Props) {
   const columns: ColumnDef<Employee>[] = React.useMemo(
     () => [
       {
-        accessorKey: "name",
+        accessorKey: "displayName",
         header: "Name",
         cell: ({ getValue }) => (
           <div className="font-medium">{getValue<string>()}</div>
@@ -91,13 +91,15 @@ export default function PendingClient({ employees, search, onAccept }: Props) {
   const filtered = React.useMemo(() => {
     if (!q) return employees;
     return employees.filter((e) =>
-      [e.name, e.email, e.role].some((field) => field.toLowerCase().includes(q))
+      [e.displayName, e.email, e.role].some((field) =>
+        field.toLowerCase().includes(q)
+      )
     );
   }, [employees, q]);
 
   function handleAccept() {
     if (!selected) return;
-    if (onAccept) onAccept(selected.id, selectedRole);
+    if (onAccept) onAccept(selected.uid, selectedRole);
     toast.success(`${selected.email} accepted as ${selectedRole}`);
     setOpen(false);
   }

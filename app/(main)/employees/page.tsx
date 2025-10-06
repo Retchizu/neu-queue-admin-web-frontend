@@ -14,7 +14,7 @@ import EmployeesClient from "./_components/employees-client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import api from "@/lib/api";
 import { toast } from "sonner";
-import { isAxiosError } from "axios";
+import { isAxiosError, AxiosError } from "axios";
 
 const EmployeesPage = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -48,10 +48,17 @@ const EmployeesPage = () => {
         toast.success(response.data.message);
       }
     } catch (error) {
-      if (isAxiosError(error) && error.response) {
-        toast.error(error.response.data?.message ?? (error as Error).message);
+      if (isAxiosError(error)) {
+        const axiosErr = error as AxiosError;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const respData: any = axiosErr.response?.data;
+        const message =
+          respData?.message ?? String(axiosErr.message ?? axiosErr);
+        toast.error(message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
-        toast.error((error as Error).message);
+        toast.error(String(error));
       }
       console.error(error);
     }

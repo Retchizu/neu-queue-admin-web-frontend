@@ -8,9 +8,8 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import api from "@/lib/api";
-import { isAxiosError } from "axios";
+import { isAxiosError, AxiosError } from "axios";
 import { toast } from "sonner";
-import { FirebaseError } from "firebase/app";
 import Image from "next/image";
 import neuLogo from "@/public/neu-logo.png";
 import { useRouter } from "next/navigation";
@@ -46,20 +45,39 @@ export default function Home() {
       localStorage.setItem("token", token);
       router.replace("/employees");
     } catch (error) {
-      if (isAxiosError(error) && error.response) {
-        if (error.response.status === 403) {
+      // Prefer axios error details when available
+      if (isAxiosError(error)) {
+        const axiosErr = error as AxiosError;
+        const status = axiosErr.response?.status;
+        if (status === 403) {
           await auth.signOut();
           localStorage.removeItem("token");
         }
-        toast.error(
-          `${error.response.status}, ${error.response.data?.message}`
-        );
-      } else if ((error as FirebaseError).code === "auth/user-disabled") {
-        toast.error(
-          "Your account is disabled. Contact the admin for more info."
-        );
+        // response.data may be any shape; coerce message safely
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const respData: any = axiosErr.response?.data;
+        const msg = respData?.message ?? String(axiosErr.message ?? axiosErr);
+        toast.error(`${status ?? ""}, ${msg}`);
+        return;
+      }
+
+      // Next, handle Firebase SDK errors explicitly
+      if (error && typeof error === "object" && "code" in error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const e = error as any;
+        if (e.code === "auth/user-disabled") {
+          toast.error(
+            "Your account is disabled. Contact the admin for more info."
+          );
+          return;
+        }
+      }
+
+      // Generic fallback
+      if (error instanceof Error) {
+        toast.error(error.message);
       } else {
-        toast.error((error as Error).message);
+        toast.error(String(error));
       }
     }
   };

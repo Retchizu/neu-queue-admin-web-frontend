@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { isAxiosError } from "axios";
+import { isAxiosError, AxiosError } from "axios";
 import StationList from "./_components/station-list";
 import CounterList from "./_components/counter-list";
 import type Station from "@/types/station";
@@ -74,10 +74,17 @@ const Stations = () => {
         const response = await api.get("/station/get");
         setStations(response.data.cashierLocationList);
       } catch (error) {
-        if (isAxiosError(error) && error.response) {
-          toast.error(error.response.data?.message ?? (error as Error).message);
+        if (isAxiosError(error)) {
+          const axiosErr = error as AxiosError;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const respData: any = axiosErr.response?.data;
+          const message =
+            respData?.message ?? String(axiosErr.message ?? axiosErr);
+          toast.error(message);
+        } else if (error instanceof Error) {
+          toast.error(error.message);
         } else {
-          toast.error((error as Error).message);
+          toast.error(String(error));
         }
         console.error(error);
       }
@@ -93,10 +100,17 @@ const Stations = () => {
         const response = await api.get(`/counter/get/${selectedStationId}`);
         setCounters(response.data.counterList);
       } catch (error) {
-        if (isAxiosError(error) && error.response) {
-          toast.error(error.response.data?.message ?? (error as Error).message);
+        if (isAxiosError(error)) {
+          const axiosErr = error as AxiosError;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const respData: any = axiosErr.response?.data;
+          const message =
+            respData?.message ?? String(axiosErr.message ?? axiosErr);
+          toast.error(message);
+        } else if (error instanceof Error) {
+          toast.error(error.message);
         } else {
-          toast.error((error as Error).message);
+          toast.error(String(error));
         }
         console.error(error);
       }
@@ -120,10 +134,17 @@ const Stations = () => {
         const result = responses.map((res) => res.data.userData);
         setEmployees(result);
       } catch (error) {
-        if (isAxiosError(error) && error.response) {
-          toast.error(error.response.data?.message ?? (error as Error).message);
+        if (isAxiosError(error)) {
+          const axiosErr = error as AxiosError;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const respData: any = axiosErr.response?.data;
+          const message =
+            respData?.message ?? String(axiosErr.message ?? axiosErr);
+          toast.error(message);
+        } else if (error instanceof Error) {
+          toast.error(error.message);
         } else {
-          toast.error((error as Error).message);
+          toast.error(String(error));
         }
         console.error("Failed to fetch counter employees:", error);
       }
@@ -140,10 +161,17 @@ const Stations = () => {
         const response = await api.get("/admin/available-cashier-employees");
         setAvailableEmployees(response.data.availableCashiers);
       } catch (error) {
-        if (isAxiosError(error) && error.response) {
-          toast.error(error.response.data?.message ?? (error as Error).message);
+        if (isAxiosError(error)) {
+          const axiosErr = error as AxiosError;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const respData: any = axiosErr.response?.data;
+          const message =
+            respData?.message ?? String(axiosErr.message ?? axiosErr);
+          toast.error(message);
+        } else if (error instanceof Error) {
+          toast.error(error.message);
         } else {
-          toast.error((error as Error).message);
+          toast.error(String(error));
         }
         console.error(error);
       }
@@ -157,10 +185,17 @@ const Stations = () => {
       setStations((prev) => [...prev, response.data.station]);
       if (response.data?.message) toast.success(response.data.message);
     } catch (error) {
-      if (isAxiosError(error) && error.response) {
-        toast.error(error.response.data?.message ?? (error as Error).message);
+      if (isAxiosError(error)) {
+        const axiosErr = error as AxiosError;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const respData: any = axiosErr.response?.data;
+        const message =
+          respData?.message ?? String(axiosErr.message ?? axiosErr);
+        toast.error(message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
-        toast.error((error as Error).message);
+        toast.error(String(error));
       }
       console.error(error);
     }
@@ -199,10 +234,17 @@ const Stations = () => {
       setStations(stations.filter((station) => station.id !== stationId));
       if (response.data?.message) toast.success(response.data.message);
     } catch (error) {
-      if (isAxiosError(error) && error.response) {
-        toast.error(error.response.data?.message ?? (error as Error).message);
+      if (isAxiosError(error)) {
+        const axiosErr = error as AxiosError;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const respData: any = axiosErr.response?.data;
+        const message =
+          respData?.message ?? String(axiosErr.message ?? axiosErr);
+        toast.error(message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
-        toast.error((error as Error).message);
+        toast.error(String(error));
       }
       console.error(error);
     }

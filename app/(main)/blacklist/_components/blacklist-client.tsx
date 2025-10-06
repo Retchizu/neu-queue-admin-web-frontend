@@ -29,7 +29,7 @@ interface Props {
   employees: Employee[];
   search?: string;
   list?: BlacklistType[];
-  onRemove?: (email: string) => void;
+  onRemove?: (email: string) => Promise<void> | void;
 }
 
 export default function BlacklistClient({
@@ -40,10 +40,12 @@ export default function BlacklistClient({
 }: Props) {
   const [internalList, setInternalList] = React.useState<BlacklistType[]>([]);
   const list = propList ?? internalList;
-  const handleRemove = (email: string) => {
-    if (onRemove) return onRemove(email);
+  const handleRemove = async (email: string) => {
+    if (onRemove) return await onRemove(email);
     setInternalList((s) => s.filter((i) => i.email !== email));
   };
+
+  const [removing, setRemoving] = React.useState(false);
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [pendingEmail, setPendingEmail] = React.useState<string | null>(null);
@@ -53,12 +55,20 @@ export default function BlacklistClient({
     setConfirmOpen(true);
   }
 
-  function confirmRemove() {
+  async function confirmRemove() {
     if (!pendingEmail) return;
-    handleRemove(pendingEmail);
-    toast.success("Removed from blacklist");
-    setConfirmOpen(false);
-    setPendingEmail(null);
+    try {
+      setRemoving(true);
+      await handleRemove(pendingEmail);
+      toast.success("Removed from blacklist");
+      setConfirmOpen(false);
+      setPendingEmail(null);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove from blacklist");
+    } finally {
+      setRemoving(false);
+    }
   }
 
   const columns: ColumnDef<BlacklistType>[] = [
@@ -140,7 +150,9 @@ export default function BlacklistClient({
               >
                 No
               </Button>
-              <Button onClick={confirmRemove}>Yes</Button>
+              <Button onClick={confirmRemove} disabled={removing}>
+                {removing ? "Removing..." : "Yes"}
+              </Button>
             </div>
           </DialogFooter>
         </DialogContent>

@@ -3,7 +3,7 @@
 import api from "@/lib/api";
 import { auth } from "@/lib/firebaseConfig";
 import { onAuthStateChanged } from "@firebase/auth";
-import { isAxiosError } from "axios";
+import { isAxiosError, AxiosError } from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,9 +17,12 @@ export const useVerifyUser = () => {
         await api.get("/user/verify");
       } catch (error) {
         if (isAxiosError(error)) {
-          const status = error.response?.status;
+          const axiosErr = error as AxiosError;
+          const status = axiosErr.response?.status;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const respData: any = axiosErr.response?.data;
           const message =
-            error.response?.data?.message ?? (error as Error).message;
+            respData?.message ?? String(axiosErr.message ?? axiosErr);
           toast.error(message);
           switch (status) {
             case 401:

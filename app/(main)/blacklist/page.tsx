@@ -23,6 +23,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import api from "@/lib/api";
+import { isAxiosError, AxiosError } from "axios";
+import { toast } from "sonner";
+import type { Blacklist as BlacklistType } from "@/types/blacklist";
 
 const Blacklist = () => {
   const employees: Employee[] = React.useMemo(() => {
@@ -79,12 +83,8 @@ const Blacklist = () => {
   }, []);
 
   const [search, setSearch] = React.useState("");
-  const [blacklist, setBlacklist] = React.useState<
-    {
-      email: string;
-      reason: string;
-    }[]
-  >([]);
+  const [blacklist, setBlacklist] = React.useState<BlacklistType[]>([]);
+  const [loading, setLoading] = React.useState(false);
 
   // dialog form state
   const [open, setOpen] = React.useState(false);
@@ -98,7 +98,40 @@ const Blacklist = () => {
     setError(null);
   }
 
-  function handleAdd() {
+  // fetch blacklist on mount
+  React.useEffect(() => {
+    let mounted = true;
+    const fetchBlacklist = async () => {
+      try {
+        setLoading(true);
+        const resp = await api.get("/admin/get-blacklist");
+        const data = resp.data;
+        if (!mounted) return;
+        setBlacklist(data.blacklist ?? []);
+      } catch (err) {
+        console.error("Failed to fetch blacklist:", err);
+        if (isAxiosError(err)) {
+          const a = err as AxiosError;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const respData: any = a.response?.data;
+          toast.error(respData?.message ?? String(a.message ?? a));
+        } else if (err instanceof Error) {
+          toast.error(err.message);
+        } else {
+          toast.error(String(err));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlacklist();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  async function handleAdd() {
     const trimmed = email.trim().toLowerCase();
     if (!trimmed) return setError("Email is required");
     if (!trimmed.endsWith("@neu.edu.ph"))
@@ -107,13 +140,63 @@ const Blacklist = () => {
     if (blacklist.some((b) => b.email.toLowerCase() === trimmed))
       return setError("This email is already blacklisted");
 
-    setBlacklist((s) => [{ email: trimmed, reason }, ...s]);
-    setOpen(false);
-    resetForm();
+    try {
+      setLoading(true);
+      const resp = await api.post("/admin/block-email", {
+        email: trimmed,
+        reason,
+      });
+      // server returns success message; update local list
+      setBlacklist((s) => [{ email: trimmed, reason }, ...s]);
+      setOpen(false);
+      resetForm();
+      toast.success(resp.data?.message ?? "Email successfully blacklisted.");
+    } catch (error: unknown) {
+      console.error(error);
+      if (isAxiosError(error)) {
+        const a = error as AxiosError;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const respData: any = a.response?.data;
+        const msg = respData?.message ?? String(a.message ?? a);
+        setError(msg);
+        toast.error(msg);
+      } else if (error instanceof Error) {
+        setError(error.message);
+        toast.error(error.message);
+      } else {
+        const msg = String(error);
+        setError(msg);
+        toast.error(msg);
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function handleRemove(emailToRemove: string) {
-    setBlacklist((s) => s.filter((b) => b.email !== emailToRemove));
+  async function handleRemove(emailToRemove: string) {
+    try {
+      setLoading(true);
+      const resp = await api.delete(
+        `/admin/unblock-email/${encodeURIComponent(emailToRemove)}`
+      );
+      setBlacklist((s) => s.filter((b) => b.email !== emailToRemove));
+      toast.success(resp.data?.message ?? "Email removed from blacklist.");
+    } catch (error: unknown) {
+      console.error(error);
+      if (isAxiosError(error)) {
+        const a = error as AxiosError;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const respData: any = a.response?.data;
+        const msg = respData?.message ?? String(a.message ?? a);
+        toast.error(msg);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error(String(error));
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -195,7 +278,9 @@ const Blacklist = () => {
                     >
                       Cancel
                     </Button>
-                    <Button onClick={handleAdd}>Add</Button>
+                    <Button onClick={handleAdd} disabled={loading}>
+                      {loading ? "Working..." : "Add"}
+                    </Button>
                   </div>
                 </DialogFooter>
               </DialogContent>
